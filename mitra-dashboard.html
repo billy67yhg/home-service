@@ -175,8 +175,7 @@
                 // Query PESANAN dengan filter CABANG
                 const qOrders = query(
                     collection(db, "pesanan"),
-                    where("cabangId", "==", cabangId),
-                    orderBy("createdAt", "desc")
+                    where("cabangId", "==", cabangId)
                 );
                 const snapOrders = await getDocs(qOrders);
                 const orders = snapOrders.docs.map(d => ({ id: d.id, ...d.data() }));
