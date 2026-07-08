@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pelanggan - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: #f3f4f6;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2563EB;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1px solid #D1D5DB;
+        }
+
+        .btn-outline:hover {
+            background: #F9FAFB;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #10B981;
+            margin: 0 0 5px 0;
+        }
+
+        .stat-card p {
+            color: #6B7280;
+            margin: 0;
+        }
+
+        .orders-section {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-item {
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-Pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-Aktif {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-Selesai {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-Bayar-Lunas {
+            background: #10B981;
+            color: white;
+        }
+
+        .status-Bayar-Pending {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .btn-logout {
+            background: #EF4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+        }
+
+        .btn-pay {
+            background: #3B82F6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .btn-pay:hover {
+            background: #2563EB;
+        }
+
+        .payment-info {
+            background: #EFF6FF;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        .btn-submit {
+            background: #10B981;
+            color: white;
+        }
+
+        .bank-info {
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .bank-info strong {
+            color: #10B981;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">HomeService</a>
+        <div><button id="logoutBtn" class="btn-logout">Logout</button></div>
+    </nav>
+
+    <div class="container">
+        <div class="action-buttons">
+            <a href="technicians.html" class="btn-action btn-secondary"><i class="fas fa-user-gear"></i> Cari
+                Teknisi</a>
+            <button onclick="openBookingModal()" class="btn-action btn-primary"><i class="fas fa-plus"></i> Buat Pesanan
+                Baru</button>
+            <a href="index.html" class="btn-action btn-outline"><i class="fas fa-home"></i> Beranda</a>
+        </div>
+
+        <div class="welcome-card">
+            <h1 style="margin: 0 0 10px 0;">Selamat Datang, <span id="customerName">Pelanggan</span>!</h1>
+            <p style="margin: 0; opacity: 0.9;">Dashboard pesanan dan layanan Anda</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalPesanan">0</h3>
+                <p>Total Pesanan</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pesananAktif">0</h3>
+                <p>Pesanan Aktif</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pesananSelesai">0</h3>
+                <p>Selesai</p>
+            </div>
+        </div>
+
+        <div class="orders-section">
+            <h2 style="margin-bottom: 20px;">Riwayat Pesanan</h2>
+            <div id="ordersList">
+                <div style="text-align: center; padding: 40px; color: #6B7280;"><i class="fas fa-spinner fa-spin"
+                        style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Memuat data pesanan...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKING MODAL -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Buat Pesanan Baru</h3><span class="modal-close"
+                    onclick="closeBookingModal()">&times;</span>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group"><label for="inputLayanan">Pilih Layanan</label><select id="inputLayanan"
+                        required>
+                        <option value="">-- Pilih Layanan --</option>
+                        <option value="Service AC">Service AC</option>
+                        <option value="Sedot WC">Sedot WC</option>
+                        <option value="Buat Kunci">Buat Kunci</option>
+                        <option value="Perbaikan Rumah">Perbaikan Rumah</option>
+                    </select></div>
+                <div class="form-group"><label for="inputTanggal">Tanggal Service</label><input type="date"
+                        id="inputTanggal" required></div>
+                <div class="form-group"><label for="inputAlamat">Alamat Lengkap</label><textarea id="inputAlamat"
+                        required placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea></div>
+                <div class="form-group"><label for="inputCatatan">Catatan Tambahan (Opsional)</label><textarea
+                        id="inputCatatan" placeholder="Contoh: AC tidak dingin, butuh sparepart, dll..."></textarea>
+                </div>
+                <div class="modal-actions"><button type="button" class="btn-cancel"
+                        onclick="closeBookingModal()">Batal</button><button type="submit" class="btn-submit">Pesan
+                        Sekarang</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Konfirmasi Pembayaran</h3><span class="modal-close"
+                    onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div class="bank-info">
+                <strong>💳 Transfer ke:</strong><br>
+                BCA: 0851 7672 0067 3103 Delfia.Billy.Safinas. HomeService<br>
+            </div>
+            <form id="paymentForm">
+                <input type="hidden" id="paymentOrderId">
+                <div class="form-group"><label>Nominal Transfer (Rp)</label><input type="text" id="paymentAmount"
+                        readonly style="background:#F3F4F6;"></div>
+                <div class="form-group"><label>Nomor Referensi / ID Transfer</label><input type="text" id="paymentRef"
+                        required placeholder="Contoh: TRF123456"></div>
+                <div class="form-group"><label>Upload Bukti Transfer (Opsional)</label><input type="file"
+                        id="paymentProof" accept="image/*"></div>
+                <div class="modal-actions"><button type="button" class="btn-cancel"
+                        onclick="closePaymentModal()">Batal</button><button type="submit" class="btn-submit">Kirim
+                        Bukti</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.openBookingModal = function () { document.getElementById('bookingModal').style.display = 'flex'; }
+        window.closeBookingModal = function () { document.getElementById('bookingModal').style.display = 'none'; document.getElementById('bookingForm').reset(); }
+        document.getElementById('bookingModal').addEventListener('click', (e) => { if (e.target === document.getElementById('bookingModal')) closeBookingModal(); });
+
+        window.openPaymentModal = function (orderId, total) {
+            document.getElementById('paymentOrderId').value = orderId;
+            document.getElementById('paymentAmount').value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+        window.closePaymentModal = function () { document.getElementById('paymentModal').style.display = 'none'; document.getElementById('paymentForm').reset(); }
+        document.getElementById('paymentModal').addEventListener('click', (e) => { if (e.target === document.getElementById('paymentModal')) closePaymentModal(); });
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) { alert('Silakan login terlebih dahulu'); window.location.href = 'customer-login.html'; return; }
+            const pesanan = {
+                pelanggan: user.email.split('@')[0], email: user.email, telepon: '',
+                layanan: document.getElementById('inputLayanan').value,
+                tanggal: document.getElementById('inputTanggal').value,
+                alamat: document.getElementById('inputAlamat').value,
+                catatan: document.getElementById('inputCatatan').value || '-',
+                status: 'Pending', total: 0, teknisiId: null,
+                statusPembayaran: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            };
+            try {
+                await addDoc(collection(db, "pesanan"), pesanan);
+                alert('✅ Pesanan berhasil dibuat! Teknisi akan segera menghubungi Anda.');
+                closeBookingModal(); loadOrders(user);
+            } catch (error) { console.error(error); alert('❌ Gagal membuat pesanan: ' + error.message); }
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const orderId = document.getElementById('paymentOrderId').value;
+            const ref = document.getElementById('paymentRef').value;
+            try {
+                await updateDoc(doc(db, "pesanan", orderId), {
+                    statusPembayaran: 'Menunggu Verifikasi',
+                    paymentRef: ref,
+                    paidAt: new Date().toISOString()
+                });
+                alert('✅ Bukti pembayaran terkirim! Admin akan memverifikasi.');
+                closePaymentModal();
+                const user = auth.currentUser;
+                if (user) loadOrders(user);
+            } catch (error) { alert('Gagal: ' + error.message); }
+        });
+
+        async function loadOrders(user) {
+            const ordersList = document.getElementById('ordersList');
+            ordersList.innerHTML = '<div style="text-align:center;padding:40px;color:#6B7280;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:10px;"></i><p>Memuat data...</p></div>';
+            try {
+                const ordersQuery = query(collection(db, "pesanan"), where("email", "==", user.email));
+                const snapshot = await getDocs(ordersQuery);
+                const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                document.getElementById('totalPesanan').textContent = orders.length;
+                document.getElementById('pesananAktif').textContent = orders.filter(o => o.status === 'Aktif').length;
+                document.getElementById('pesananSelesai').textContent = orders.filter(o => o.status === 'Selesai').length;
+                if (orders.length === 0) {
+                    ordersList.innerHTML = `<div style="text-align:center;padding:40px;color:#6B7280;"><i class="fas fa-inbox" style="font-size:3rem;margin-bottom:15px;opacity:0.5;"></i><p>Belum ada pesanan</p><p style="font-size:0.9rem;">Silakan buat pesanan baru untuk mulai menggunakan layanan</p><button onclick="openBookingModal()" style="margin-top:15px;padding:10px 24px;background:#10B981;color:white;border:none;border-radius:8px;cursor:pointer;">Buat Pesanan</button></div>`;
+                } else {
+                    ordersList.innerHTML = orders.map(order => {
+                        const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+                        let paymentBadge = '';
+                        if (order.status === 'Selesai' && order.total > 0) {
+                            if (order.statusPembayaran === 'Lunas') {
+                                paymentBadge = `<span class="status-badge status-Bayar-Lunas">💰 Lunas</span>`;
+                            } else if (order.statusPembayaran === 'Menunggu Verifikasi') {
+                                paymentBadge = `<span class="status-badge status-Bayar-Pending">⏳ Menunggu Verifikasi</span>`;
+                            } else {
+                                paymentBadge = `<button class="btn-pay" onclick="openPaymentModal('${order.id}', ${order.total})">💳 Bayar Sekarang</button>`;
+                            }
+                        }
+                        return `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <strong>${order.layanan || 'Layanan'}</strong>
+                                <span class="status-badge status-${order.status || 'Pending'}">${order.status || 'Pending'}</span>
+                            </div>
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📅 ${order.tanggal || '-'} | 📍 ${order.alamat || '-'}</p>
+                            ${order.total > 0 ? `<p style="color:#10B981;font-weight:600;font-size:1.1rem;margin:10px 0;">💰 Total: ${formatRupiah(order.total)}</p>` : ''}
+                            ${paymentBadge}
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📞 ${order.telepon || order.phone || '-'}</p>
+                            ${order.catatan ? `<p style="color:#6B7280;font-size:0.85rem;margin:5px 0;font-style:italic;">📝 ${order.catatan}</p>` : ''}
+                        </div>`;
+                    }).join('');
+                }
+            } catch (error) { console.error('Error loading orders:', error); ordersList.innerHTML = `<div style="text-align:center;padding:40px;color:#EF4444;"><i class="fas fa-exclamation-triangle" style="font-size:2rem;margin-bottom:10px;"></i><p>Gagal memuat pesanan</p><p style="font-size:0.85rem;">${error.message}</p></div>`; }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'customer-login.html'; return; }
+            document.getElementById('customerName').textContent = user.email.split('@')[0];
+            loadOrders(user);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => { await signOut(auth); window.location.href = 'index.html'; });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Teknisi - HomeService</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --text-dark: #111827;
+            --text-muted: #6B7280;
+            --bg-light: #F3F4F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-light);
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .btn-back {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .btn-back:hover {
+            background: #f3f4f6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .tech-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+        }
+
+        .tech-service {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            background: #D1FAE5;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .tech-phone {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            color: #F59E0B;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-booking {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: auto;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-booking:hover {
+            background: var(--primary-dark);
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-close:hover {
+            color: var(--text-dark);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .selected-tech {
+            background: #D1FAE5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .selected-tech strong {
+            color: var(--primary-dark);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: var(--text-dark);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">HomeService</a>
+        <a href="customer-dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
+    </nav>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <h1>Pilih Teknisi Profesional</h1>
+        <p class="subtitle">Teknisi berpengalaman siap membantu kebutuhan rumah Anda</p>
+
+        <div class="tech-grid" id="techList">
+            <p style="text-align:center; width:100%; color: var(--text-muted);">Memuat data teknisi...</p>
+        </div>
+    </div>
+
+    <!-- BOOKING MODAL -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Buat Pesanan</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+
+            <div class="selected-tech">
+                <strong>👨‍🔧 Teknisi Dipilih:</strong>
+                <div id="selectedTechName">-</div>
+                <div id="selectedTechService" style="font-size: 0.9rem; color: var(--text-muted);"></div>
+            </div>
+
+            <form id="bookingForm">
+                <input type="hidden" id="selectedTechId">
+
+                <div class="form-group">
+                    <label>Pilih Layanan</label>
+                    <select id="inputLayanan" required>
+                        <option value="">-- Pilih Layanan --</option>
+                        <option value="Service AC">Service AC</option>
+                        <option value="Sedot WC">Sedot WC</option>
+                        <option value="Buat Kunci">Buat Kunci</option>
+                        <option value="Perbaikan Rumah">Perbaikan Rumah</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tanggal Service</label>
+                    <input type="date" id="inputTanggal" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat Lengkap</label>
+                    <textarea id="inputAlamat" required
+                        placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Catatan Tambahan (Opsional)</label>
+                    <textarea id="inputCatatan" placeholder="Contoh: AC tidak dingin, butuh sparepart..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-submit">Pesan Sekarang</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // Check if user is logged in
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                alert('Silakan login terlebih dahulu untuk memesan layanan.');
+                window.location.href = 'customer-login.html';
+                return;
+            }
+            currentUser = user;
+        });
+
+        // Load technicians from Firestore
+        async function loadTechnicians() {
+            const list = document.getElementById('techList');
+            try {
+                const q = query(collection(db, "teknisi"), where("status", "==", "Aktif"));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    list.innerHTML = '<p style="text-align:center; width:100%; color: var(--text-muted);">Belum ada teknisi tersedia.</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const t = doc.data();
+                    const initial = t.nama ? t.nama.charAt(0).toUpperCase() : 'T';
+
+                    html += `
+                    <div class="tech-card">
+                        <div class="avatar">${initial}</div>
+                        <div class="tech-name">${t.nama}</div>
+                        <div class="tech-service">${t.layanan || 'General'}</div>
+                        <div class="tech-phone">📞 ${t.phone || '-'}</div>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> ${t.rating || '4.5'} 
+                            <span style="color:#9CA3AF">(${t.orderCount || 0} order)</span>
+                        </div>
+                        <button class="btn-booking" onclick="openBookingModal('${doc.id}', '${t.nama.replace("'", "\\'")}', '${t.layanan || 'General'}')">
+                            Pilih Teknisi
+                        </button>
+                    </div>
+                    `;
+                });
+                list.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading technicians:', error);
+                list.innerHTML = '<p style="text-align:center; color: #EF4444;">Gagal memuat teknisi.</p>';
+            }
+        }
+
+        // Global functions for modal
+        window.openBookingModal = (techId, techName, techService) => {
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu.');
+                window.location.href = 'customer-login.html';
+                return;
+            }
+
+            document.getElementById('selectedTechId').value = techId;
+            document.getElementById('selectedTechName').textContent = techName;
+            document.getElementById('selectedTechService').textContent = techService;
+            document.getElementById('bookingModal').style.display = 'flex';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('bookingForm').reset();
+        };
+
+        // Close modal when clicking outside
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('bookingModal')) {
+                closeModal();
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu.');
+                return;
+            }
+
+            const pesanan = {
+                pelanggan: currentUser.email.split('@')[0],
+                email: currentUser.email,
+                telepon: currentUser.phoneNumber || '',
+                layanan: document.getElementById('inputLayanan').value,
+                tanggal: document.getElementById('inputTanggal').value,
+                alamat: document.getElementById('inputAlamat').value,
+                catatan: document.getElementById('inputCatatan').value || '-',
+                teknisiId: document.getElementById('selectedTechId').value,
+                teknisiNama: document.getElementById('selectedTechName').textContent,
+                status: 'Pending',
+                total: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                await addDoc(collection(db, "pesanan"), pesanan);
+                alert('✅ Pesanan berhasil dibuat! Teknisi akan segera menghubungi Anda.');
+                closeModal();
+                // Redirect to dashboard to see the order
+                window.location.href = 'customer-dashboard.html';
+            } catch (error) {
+                console.error('Error creating order:', error);
+                alert('❌ Gagal membuat pesanan: ' + error.message);
+            }
+        });
+
+        // Initialize
+        loadTechnicians();
+    </script>
+</body>
+
+</html>

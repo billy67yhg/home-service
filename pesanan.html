@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pesanan - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* KHUSUS PESANAN */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-aktif {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-selesai {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-batal {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* PAYMENT STATUS BADGES */
+        .payment-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .payment-lunas {
+            background: #10B981;
+            color: white;
+        }
+
+        .payment-pending {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .payment-belum {
+            background: #6B7280;
+            color: white;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-muted);
+        }
+
+        .action-btn:hover {
+            background: #F3F4F6;
+            color: var(--primary-dark);
+        }
+
+        .action-btn.verify {
+            color: #10B981;
+            border-color: #10B981;
+        }
+
+        .action-btn.verify:hover {
+            background: #D1FAE5;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .close-modal:hover {
+            color: var(--text-dark);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .payment-proof {
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .payment-proof i {
+            font-size: 3rem;
+            color: #9CA3AF;
+            margin-bottom: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-approve {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-reject {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #374151;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">HomeService</div>
+            <div class="admin-profile">
+                <div class="admin-avatar">AD</div>
+                <div class="admin-info">
+                    <div>Admin</div><small>Super Admin</small>
+                </div>
+            </div>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="teknisi.html" class="nav-item"><i class="fas fa-user-gear"></i> Teknisi</a>
+            <a href="layanan.html" class="nav-item"><i class="fas fa-screwdriver-wrench"></i> Layanan</a>
+            <a href="pesanan.html" class="nav-item active"><i class="fas fa-clipboard-list"></i> Pesanan</a>
+            <a href="pelanggan.html" class="nav-item"><i class="fas fa-users"></i> Pelanggan</a>
+            <a href="transaksi.html" class="nav-item"><i class="fas fa-receipt"></i> Transaksi</a>
+            <a href="laporan.html" class="nav-item"><i class="fas fa-file-lines"></i> Laporan</a>
+            <a href="pengaturan.html" class="nav-item"><i class="fas fa-gear"></i> Pengaturan</a>
+            <a href="#" class="logout-btn"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2 class="page-title">Kelola Pesanan</h2>
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput"
+                        placeholder="Cari pesanan..."></div>
+            </div>
+
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
+                <div class="filter-tabs" id="filterTabs">
+                    <div class="filter-tab active" data-filter="all">Semua</div>
+                    <div class="filter-tab" data-filter="Pending">Pending</div>
+                    <div class="filter-tab" data-filter="Aktif">Aktif</div>
+                    <div class="filter-tab" data-filter="Selesai">Selesai</div>
+                    <div class="filter-tab" data-filter="Batal">Dibatalkan</div>
+                    <!-- TAB BARU: Menunggu Pembayaran -->
+                    <div class="filter-tab" data-filter="payment-pending"
+                        style="background:#F59E0B;color:white;border-color:#F59E0B;">💳 Menunggu Bayar</div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-export" id="exportBtn"><i class="fas fa-file-export"></i> Export</button>
+                    <button class="btn-primary" id="addPesananBtn"><i class="fas fa-plus"></i> Tambah</button>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Order</th>
+                                <th>Pelanggan</th>
+                                <th>Teknisi</th>
+                                <th>Layanan</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Pembayaran</th>
+                                <th>Total</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pesananTableBody">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <div class="pagination-info" id="paginationInfo">Menampilkan 0 dari 0 pesanan</div>
+                    <div class="pagination-btns">
+                        <div class="page-btn"><i class="fas fa-chevron-left"></i></div>
+                        <div class="page-btn active">1</div>
+                        <div class="page-btn">2</div>
+                        <div class="page-btn">3</div>
+                        <div class="page-btn"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DETAIL PESANAN -->
+    <div id="pesananModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detail Pesanan</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody">
+                <!-- Detail will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VERIFIKASI PEMBAYARAN -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💳 Verifikasi Pembayaran</h3>
+                <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            </div>
+
+            <div id="paymentDetails">
+                <!-- Payment details will be rendered here -->
+            </div>
+
+            <div class="payment-proof">
+                <i class="fas fa-file-invoice"></i>
+                <p style="margin:0;font-weight:500;">Bukti Transfer</p>
+                <p style="margin:5px 0 0 0;font-size:0.85rem;color:#6B7280;" id="paymentRefDisplay">Ref: -</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePaymentModal()">Batal</button>
+                <button class="btn-reject" onclick="rejectPayment()">❌ Tolak</button>
+                <button class="btn-approve" onclick="approvePayment()">✅ Terima & Lunas</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let pesananData = [];
+        let currentFilter = 'all';
+        let currentPaymentOrderId = null;
+
+        // Load pesanan from Firestore
+        async function loadPesanan() {
+            try {
+                const q = query(collection(db, "pesanan"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                pesananData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTable();
+            } catch (error) {
+                console.error('Error loading pesanan:', error);
+            }
+        }
+
+        // Filter data
+        function getFilteredData() {
+            let filtered = pesananData;
+
+            // Filter by status
+            if (currentFilter !== 'all' && currentFilter !== 'payment-pending') {
+                filtered = filtered.filter(p => p.status === currentFilter);
+            }
+
+            // Filter by payment status
+            if (currentFilter === 'payment-pending') {
+                filtered = filtered.filter(p => p.statusPembayaran === 'Menunggu Verifikasi');
+            }
+
+            // Search
+            if (document.getElementById('searchInput').value) {
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.pelanggan?.toLowerCase().includes(term) ||
+                    p.email?.toLowerCase().includes(term) ||
+                    p.layanan?.toLowerCase().includes(term)
+                );
+            }
+
+            return filtered;
+        }
+
+        // Render table
+        function renderTable() {
+            const filtered = getFilteredData();
+            const tbody = document.getElementById('pesananTableBody');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#6B7280;padding:40px;">Tidak ada data pesanan</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => {
+                // Payment badge
+                let paymentBadge = '';
+                if (p.status === 'Selesai' && p.total > 0) {
+                    if (p.statusPembayaran === 'Lunas') {
+                        paymentBadge = `<span class="payment-badge payment-lunas">💰 Lunas</span>`;
+                    } else if (p.statusPembayaran === 'Menunggu Verifikasi') {
+                        paymentBadge = `<span class="payment-badge payment-pending">⏳ Menunggu</span>`;
+                    } else {
+                        paymentBadge = `<span class="payment-badge payment-belum">⚪ Belum Bayar</span>`;
+                    }
+                } else {
+                    paymentBadge = `<span class="payment-badge payment-belum">-</span>`;
+                }
+
+                // Verify button (only show if waiting for payment verification)
+                const verifyBtn = (p.status === 'Selesai' && p.statusPembayaran === 'Menunggu Verifikasi')
+                    ? `<button class="action-btn verify" onclick="openPaymentModal('${p.id}')" title="Verifikasi Pembayaran"><i class="fas fa-check-circle"></i></button>`
+                    : '';
+
+                return `
+                <tr>
+                    <td style="font-family:monospace;font-size:0.85rem;">${p.id?.substring(0, 8) || '-'}</td>
+                    <td>
+                        <div style="font-weight:500;">${p.pelanggan || '-'}</div>
+                        <div style="font-size:0.8rem;color:#6B7280;">${p.email || '-'}</div>
+                    </td>
+                    <td>${p.teknisiNama || (p.teknisiId ? 'Ditugaskan' : '-')}</td>
+                    <td>${p.layanan || '-'}</td>
+                    <td>${p.tanggal || '-'}</td>
+                    <td><span class="status-badge status-${p.status?.toLowerCase()}">${p.status || '-'}</span></td>
+                    <td>${paymentBadge}</td>
+                    <td style="font-weight:600;color:#10B981;">${p.total ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(p.total) : '-'}</td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <button class="action-btn" onclick="viewDetail('${p.id}')" title="Lihat Detail"><i class="fas fa-eye"></i></button>
+                            ${verifyBtn}
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${filtered.length} pesanan`;
+        }
+
+        // View detail modal
+        window.viewDetail = (id) => {
+            const p = pesananData.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('modalTitle').textContent = 'Detail Pesanan';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-row"><span class="detail-label">ID Order</span><span class="detail-value">${p.id}</span></div>
+                <div class="detail-row"><span class="detail-label">Pelanggan</span><span class="detail-value">${p.pelanggan}</span></div>
+                <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${p.email}</span></div>
+                <div class="detail-row"><span class="detail-label">Telepon</span><span class="detail-value">${p.telepon || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Teknisi</span><span class="detail-value">${p.teknisiNama || (p.teknisiId ? 'Ditugaskan' : 'Belum ada')}</span></div>
+                <div class="detail-row"><span class="detail-label">Layanan</span><span class="detail-value">${p.layanan}</span></div>
+                <div class="detail-row"><span class="detail-label">Tanggal</span><span class="detail-value">${p.tanggal}</span></div>
+                <div class="detail-row"><span class="detail-label">Alamat</span><span class="detail-value">${p.alamat}</span></div>
+                <div class="detail-row"><span class="detail-label">Catatan</span><span class="detail-value">${p.catatan || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="status-badge status-${p.status?.toLowerCase()}">${p.status}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Total</span><span class="detail-value" style="color:#10B981;font-size:1.1rem;">${p.total ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(p.total) : '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Pembayaran</span><span class="detail-value">${p.statusPembayaran || 'Belum Ada'}</span></div>
+                ${p.paymentRef ? `<div class="detail-row"><span class="detail-label">Ref. Transfer</span><span class="detail-value">${p.paymentRef}</span></div>` : ''}
+                ${p.paidAt ? `<div class="detail-row"><span class="detail-label">Dibayar Pada</span><span class="detail-value">${new Date(p.paidAt).toLocaleString('id-ID')}</span></div>` : ''}
+            `;
+            document.getElementById('pesananModal').style.display = 'flex';
+        };
+
+        // Payment verification modal
+        window.openPaymentModal = (id) => {
+            const p = pesananData.find(x => x.id === id);
+            if (!p) return;
+
+            currentPaymentOrderId = id;
+            document.getElementById('paymentDetails').innerHTML = `
+                <div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value">${p.id?.substring(0, 8)}</span></div>
+                <div class="detail-row"><span class="detail-label">Pelanggan</span><span class="detail-value">${p.pelanggan}</span></div>
+                <div class="detail-row"><span class="detail-label">Layanan</span><span class="detail-value">${p.layanan}</span></div>
+                <div class="detail-row"><span class="detail-label">Total Bayar</span><span class="detail-value" style="color:#10B981;font-size:1.2rem;font-weight:700;">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(p.total)}</span></div>
+            `;
+            document.getElementById('paymentRefDisplay').textContent = `Ref: ${p.paymentRef || '-'}`;
+            document.getElementById('paymentModal').style.display = 'flex';
+        };
+
+        window.closeModal = () => { document.getElementById('pesananModal').style.display = 'none'; };
+        window.closePaymentModal = () => {
+            document.getElementById('paymentModal').style.display = 'none';
+            currentPaymentOrderId = null;
+        };
+
+        // Approve payment
+        window.approvePayment = async () => {
+            if (!currentPaymentOrderId || !confirm('Konfirmasi pembayaran ini LUNAS?')) return;
+            try {
+                await updateDoc(doc(db, "pesanan", currentPaymentOrderId), {
+                    statusPembayaran: 'Lunas',
+                    verifiedAt: new Date().toISOString()
+                });
+                alert('✅ Pembayaran dikonfirmasi LUNAS!');
+                closePaymentModal();
+                loadPesanan();
+            } catch (error) {
+                alert('Gagal: ' + error.message);
+            }
+        };
+
+        // Reject payment
+        window.rejectPayment = async () => {
+            if (!currentPaymentOrderId || !confirm('Tolak pembayaran ini? Status akan kembali ke "Belum Bayar".')) return;
+            try {
+                await updateDoc(doc(db, "pesanan", currentPaymentOrderId), {
+                    statusPembayaran: 'Belum Bayar',
+                    paymentRef: null
+                });
+                alert('❌ Pembayaran ditolak. Customer dapat mengupload ulang bukti.');
+                closePaymentModal();
+                loadPesanan();
+            } catch (error) {
+                alert('Gagal: ' + error.message);
+            }
+        };
+
+        // Event listeners
+        document.getElementById('filterTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tab')) {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderTable();
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+
+        // Initialize
+        loadPesanan();
+    </script>
+</body>
+
+</html>

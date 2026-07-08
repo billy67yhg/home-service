@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Teknisi - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* TAMBAHKAN INI DI BAWAH STYLE YANG SUDAH ADA */
+
+        /* Perbaiki Tabel */
+        .table-responsive table td {
+            padding: 12px 16px !important;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        /* Perbaiki Pagination biar horizontal */
+        .pagination-btns {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* KHUSUS HALAMAN TEKNISI */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .filter-tab.active {
+            background: var(--primary-dark);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .tech-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tech-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            background: var(--primary);
+            color: white;
+        }
+
+        .tech-name {
+            font-weight: 500;
+        }
+
+        .tech-id {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .contact-text {
+            font-weight: 500;
+        }
+
+        .contact-email {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .rating {
+            color: #F59E0B;
+            font-weight: 500;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .action-btn.view {
+            color: #3B82F6;
+        }
+
+        .action-btn.edit {
+            color: #F59E0B;
+        }
+
+        .action-btn.activate {
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .action-btn.delete {
+            color: var(--danger);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .close-modal:hover {
+            color: var(--text-dark);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .password-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">HomeService</div>
+            <div class="admin-profile">
+                <div class="admin-avatar">AD</div>
+                <div class="admin-info">
+                    <div style="font-weight: 500;">Admin</div><small>Super Admin</small>
+                </div>
+            </div>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="teknisi.html" class="nav-item active"><i class="fas fa-user-gear"></i> Teknisi</a>
+            <a href="layanan.html" class="nav-item"><i class="fas fa-screwdriver-wrench"></i> Layanan</a>
+            <a href="pesanan.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Pesanan</a>
+            <a href="pelanggan.html" class="nav-item"><i class="fas fa-users"></i> Pelanggan</a>
+            <a href="transaksi.html" class="nav-item"><i class="fas fa-receipt"></i> Transaksi</a>
+            <a href="laporan.html" class="nav-item"><i class="fas fa-file-lines"></i> Laporan</a>
+            <a href="pengaturan.html" class="nav-item"><i class="fas fa-gear"></i> Pengaturan</a>
+            <a href="#" class="logout-btn"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2 class="page-title">Kelola Teknisi</h2>
+                <div class="search-box">
+                    <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                    <input type="text" id="searchInput" placeholder="Cari teknisi...">
+                </div>
+                <div class="top-actions">
+                    <div class="icon-btn"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+                    <div class="admin-avatar" style="width: 36px; height: 36px; font-size: 0.8rem;">AD</div>
+                </div>
+            </div>
+
+            <div class="controls-bar">
+                <div class="filter-tabs" id="filterTabs">
+                    <div class="filter-tab active" data-filter="all">Semua (<span id="countAll">0</span>)</div>
+                    <div class="filter-tab" data-filter="Aktif">Aktif (<span id="countAktif">0</span>)</div>
+                    <div class="filter-tab" data-filter="Nonaktif">Nonaktif (<span id="countNonaktif">0</span>)</div>
+                    <div class="filter-tab" data-filter="Pending">Pending (<span id="countPending">0</span>)</div>
+                </div>
+                <button class="btn-primary" id="addTeknisiBtn"><i class="fas fa-plus"></i> Tambah</button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Teknisi</th>
+                                <th>Kontak</th>
+                                <th>Layanan</th>
+                                <th>Order</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teknisiTableBody">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="pagination-info" id="paginationInfo">Menampilkan 0 teknisi</div>
+                    <div class="pagination-btns">
+                        <div class="page-btn" id="prevPage"><i class="fas fa-chevron-left"></i></div>
+                        <div class="page-numbers" id="pageNumbers"></div>
+                        <div class="page-btn" id="nextPage"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH / EDIT -->
+    <div id="teknisiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Teknisi</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="teknisiForm">
+                <input type="hidden" id="teknisiId">
+                <div class="form-group">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" id="inputNama" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nomor Telepon</label>
+                    <input type="tel" id="inputPhone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="inputEmail" class="form-input" required>
+                </div>
+                <!-- PASSWORD FIELD BARU -->
+                <div class="form-group">
+                    <label class="form-label">Password Sementara</label>
+                    <input type="text" id="inputPassword" class="form-input" required placeholder="Contoh: Teknisi123!">
+                    <small class="password-hint">💡 Berikan password ini ke teknisi untuk login pertama kali</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Layanan</label>
+                    <input type="text" id="inputLayanan" class="form-input" placeholder="Contoh: Service AC, Sedot WC"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="inputStatus" class="form-input">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let teknisiData = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentFilter = 'all';
+
+        // DOM Elements
+        const modal = document.getElementById('teknisiModal');
+        const form = document.getElementById('teknisiForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const addBtn = document.getElementById('addTeknisiBtn');
+        const closeBtn = document.querySelector('.close-modal');
+        const tableBody = document.getElementById('teknisiTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const filterTabs = document.getElementById('filterTabs');
+
+        // Load teknisi from Firestore
+        async function loadTeknisi() {
+            try {
+                const q = query(collection(db, "teknisi"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                teknisiData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateStats();
+                renderTable();
+            } catch (error) {
+                console.error('Error loading teknisi:', error);
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#EF4444;padding:20px;">Gagal memuat data</td></tr>`;
+            }
+        }
+
+        // Update stats counters
+        function updateStats() {
+            document.getElementById('countAll').textContent = teknisiData.length;
+            document.getElementById('countAktif').textContent = teknisiData.filter(t => t.status === 'Aktif').length;
+            document.getElementById('countNonaktif').textContent = teknisiData.filter(t => t.status === 'Nonaktif').length;
+            document.getElementById('countPending').textContent = teknisiData.filter(t => t.status === 'Pending').length;
+        }
+
+        // Filter data
+        function getFilteredData() {
+            let filtered = teknisiData;
+            if (currentFilter !== 'all') {
+                filtered = teknisiData.filter(t => t.status === currentFilter);
+            }
+            if (searchInput.value) {
+                const term = searchInput.value.toLowerCase();
+                filtered = filtered.filter(t =>
+                    t.nama?.toLowerCase().includes(term) ||
+                    t.email?.toLowerCase().includes(term) ||
+                    t.phone?.includes(term)
+                );
+            }
+            return filtered;
+        }
+
+        // Render table with pagination
+        function renderTable() {
+            const filtered = getFilteredData();
+            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filtered.slice(start, start + itemsPerPage);
+
+            if (pageData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#6B7280;padding:40px;">Tidak ada data teknisi</td></tr>`;
+            } else {
+                tableBody.innerHTML = pageData.map(tech => {
+                    const initial = tech.nama?.charAt(0).toUpperCase() || 'T';
+                    return `
+                    <tr>
+                        <td>
+                            <div class="tech-cell">
+                                <div class="tech-avatar">${initial}</div>
+                                <div>
+                                    <div class="tech-name">${tech.nama}</div>
+                                    <div class="tech-id">${tech.id?.substring(0, 8) || '-'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-text">${tech.phone || '-'}</div>
+                            <div class="contact-email">${tech.email || '-'}</div>
+                        </td>
+                        <td>${tech.layanan || '-'}</td>
+                        <td>${tech.orderCount || 0}</td>
+                        <td><span class="rating">⭐ ${tech.rating || '0.0'}</span></td>
+                        <td><span class="status-badge status-${tech.status}">${tech.status}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit" onclick="editTeknisi('${tech.id}')"><i class="fas fa-pen"></i></button>
+                                <button class="action-btn ${tech.status === 'Aktif' ? 'activate' : ''}" onclick="toggleStatus('${tech.id}', '${tech.status}')">
+                                    <i class="fas fa-${tech.status === 'Aktif' ? 'lock' : 'check'}"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deleteTeknisi('${tech.id}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update pagination info
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${start + 1}-${Math.min(start + itemsPerPage, filtered.length)} dari ${filtered.length} teknisi`;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pageNumbers');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // Global functions for onclick handlers
+        window.goToPage = (page) => { currentPage = page; renderTable(); };
+        window.editTeknisi = (id) => openModal('edit', id);
+        window.toggleStatus = async (id, currentStatus) => {
+            if (!confirm(`Ubah status teknisi menjadi ${currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif'}?`)) return;
+            try {
+                await updateDoc(doc(db, "teknisi", id), {
+                    status: currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif',
+                    updatedAt: new Date().toISOString()
+                });
+                alert('✅ Status updated!');
+                loadTeknisi();
+            } catch (error) {
+                alert('Gagal update: ' + error.message);
+            }
+        };
+        window.deleteTeknisi = async (id) => {
+            if (!confirm('Hapus teknisi ini? Data tidak bisa dikembalikan!')) return;
+            try {
+                await deleteDoc(doc(db, "teknisi", id));
+                alert('✅ Teknisi dihapus!');
+                loadTeknisi();
+            } catch (error) {
+                alert('Gagal hapus: ' + error.message);
+            }
+        };
+
+        // Modal functions
+        function openModal(mode, id = null) {
+            modalTitle.textContent = mode === 'edit' ? 'Edit Teknisi' : 'Tambah Teknisi';
+            form.reset();
+            document.getElementById('teknisiId').value = '';
+
+            if (mode === 'edit' && id) {
+                const tech = teknisiData.find(t => t.id === id);
+                if (tech) {
+                    document.getElementById('teknisiId').value = tech.id;
+                    document.getElementById('inputNama').value = tech.nama || '';
+                    document.getElementById('inputPhone').value = tech.phone || '';
+                    document.getElementById('inputEmail').value = tech.email || '';
+                    document.getElementById('inputLayanan').value = tech.layanan || '';
+                    document.getElementById('inputStatus').value = tech.status || 'Aktif';
+                    // Password field kosong untuk edit (tidak diubah jika kosong)
+                    document.getElementById('inputPassword').required = false;
+                    document.getElementById('inputPassword').placeholder = 'Kosongkan jika tidak ingin mengubah password';
+                }
+            } else {
+                document.getElementById('inputPassword').required = true;
+                document.getElementById('inputPassword').placeholder = 'Contoh: Teknisi123!';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            document.getElementById('inputPassword').required = true;
+        }
+
+        // Handle form submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('teknisiId').value;
+            const nama = document.getElementById('inputNama').value;
+            const phone = document.getElementById('inputPhone').value;
+            const email = document.getElementById('inputEmail').value;
+            const password = document.getElementById('inputPassword').value;
+            const layanan = document.getElementById('inputLayanan').value;
+            const status = document.getElementById('inputStatus').value;
+
+            try {
+                if (!id) {
+                    // ➕ MODE TAMBAH: Buat Auth + Firestore
+                    await createUserWithEmailAndPassword(auth, email, password);
+
+                    await addDoc(collection(db, "teknisi"), {
+                        nama, phone, email, layanan, status,
+                        rating: 0, orderCount: 0,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                    alert('✅ Teknisi berhasil didaftarkan! Berikan email & password ke teknisi.');
+                } else {
+                    // ✏️ MODE EDIT: Update Firestore saja
+                    const updateData = { nama, phone, email, layanan, status, updatedAt: new Date().toISOString() };
+                    // Hanya update password jika diisi
+                    if (password) {
+                        // Note: Update password Auth butuh re-authentication, jadi untuk simplicity kita skip dulu
+                        // Bisa ditambahkan fitur "Ganti Password" terpisah nanti
+                        console.log('Password change skipped - needs re-auth');
+                    }
+                    await updateDoc(doc(db, "teknisi", id), updateData);
+                    alert('✅ Data teknisi berhasil diupdate!');
+                }
+                closeModal();
+                loadTeknisi();
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('❌ Email sudah terdaftar!');
+                } else {
+                    alert('❌ Gagal: ' + error.message);
+                }
+            }
+        });
+
+        // Event listeners
+        addBtn.addEventListener('click', () => openModal('add'));
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
+
+        filterTabs.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tab')) {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                currentPage = 1;
+                renderTable();
+            }
+        });
+
+        // Initialize
+        loadTeknisi();
+    </script>
+</body>
+
+</html>

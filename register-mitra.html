@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Mitra - HomeService</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h1 {
+            color: #10B981;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #10B981;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-group small {
+            color: #6B7280;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #10B981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #059669;
+        }
+
+        .btn-submit:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #10B981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #10B981;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #EF4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-box">
+        <div class="form-header">
+            <h1><i class="fas fa-store"></i> Daftar Mitra</h1>
+            <p>Bergabunglah sebagai pemilik jasa di HomeService</p>
+        </div>
+
+        <div id="alertBox"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label>Nama Pemilik <span style="color:red">*</span></label>
+                <input type="text" id="namaPemilik" required placeholder="Contoh: Budi Santoso">
+            </div>
+
+            <div class="form-group">
+                <label>Nama Toko/Jasa <span style="color:red">*</span></label>
+                <input type="text" id="namaToko" required placeholder="Contoh: Service AC Bangkinang">
+            </div>
+
+            <div class="form-group">
+                <label>Email <span style="color:red">*</span></label>
+                <input type="email" id="email" required placeholder="email@anda.com">
+                <small>Email ini akan digunakan untuk login</small>
+            </div>
+
+            <div class="form-group">
+                <label>Password <span style="color:red">*</span></label>
+                <input type="password" id="password" required placeholder="Minimal 6 karakter" minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label>Nomor Telepon/WhatsApp</label>
+                <input type="tel" id="noTelepon" placeholder="Contoh: 081234567890">
+            </div>
+
+            <div class="form-group">
+                <label>Lokasi/Area Layanan <span style="color:red">*</span></label>
+                <textarea id="lokasi" required rows="3"
+                    placeholder="Contoh: Jl. Jend. Sudirman No. 123, Bangkinang, Riau"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Nomor Rekening (untuk pembayaran)</label>
+                <input type="text" id="noRekening" placeholder="Contoh: BCA 1234567890">
+                <small>Nomor rekening untuk menerima pembayaran dari customer</small>
+            </div>
+
+            <div class="form-group">
+                <label>Jenis Layanan yang Ditawarkan</label>
+                <input type="text" id="jenisLayanan" placeholder="Contoh: Service AC, Sedot WC, Perbaikan Rumah">
+                <small>Pisahkan dengan koma (,)</small>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Ajukan Pendaftaran
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← Kembali ke Beranda</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const alertBox = document.getElementById('alertBox');
+
+        function showAlert(message, type = 'success') {
+            alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => { alertBox.innerHTML = ''; }, 5000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                const data = {
+                    namaPemilik: document.getElementById('namaPemilik').value,
+                    namaToko: document.getElementById('namaToko').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value, // Nanti kita hash di step berikutnya
+                    noTelepon: document.getElementById('noTelepon').value,
+                    lokasi: document.getElementById('lokasi').value,
+                    noRekening: document.getElementById('noRekening').value,
+                    jenisLayanan: document.getElementById('jenisLayanan').value,
+                    status: 'pending', // <-- PENTING: Status pending menunggu approval
+                    createdAt: new Date().toISOString(),
+                    approvedAt: null,
+                    approvedBy: null
+                };
+
+                await addDoc(collection(db, "cabang"), data);
+
+                showAlert('✅ Pendaftaran berhasil! Mohon tunggu verifikasi dari Super Admin. Kami akan menghubungi Anda via email.', 'success');
+                form.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('❌ Gagal mendaftar: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Pendaftaran';
+            }
+        });
+    </script>
+</body>
+
+</html>

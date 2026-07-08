@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Teknisi - HomeService</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #F3F4F6;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10B981;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background: #EF4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #10B981;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #6B7280;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .order-card {
+            border: 1px solid #E5E7EB;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: #F9FAFB;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-Pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-Aktif {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-Selesai {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-accept {
+            background: #10B981;
+        }
+
+        .btn-complete {
+            background: #3B82F6;
+        }
+
+        .btn-reject {
+            background: #EF4444;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 10px;
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        /* MODAL HARGA */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        .btn-submit {
+            background: #10B981;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-user-gear"></i> Teknisi Portal</div>
+        <div class="user-info">
+            <span id="technicianName">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h1>Selamat Datang, <span id="techNameDisplay">Teknisi</span>!</h1>
+            <p>Kelola pesanan dan update status pekerjaan Anda</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalOrders">0</h3>
+                <p>Total Pesanan</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingOrders">0</h3>
+                <p>Menunggu</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeOrders">0</h3>
+                <p>Sedang Dikerjakan</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Pesanan Baru (Pending)</h2>
+            <div id="pendingList">
+                <p>Memuat...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔨 Sedang Dikerjakan</h2>
+            <div id="activeList">
+                <p>Belum ada pesanan aktif</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL INPUT HARGA -->
+    <div id="hargaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Input Total Biaya</h3>
+                <span class="modal-close" onclick="closeHargaModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Total Biaya Service (Rp)</label>
+                <input type="number" id="inputTotal" placeholder="Contoh: 150000" min="0">
+                <small style="color:#6B7280;font-size:0.8rem;">Masukkan total biaya jasa + sparepart jika ada</small>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeHargaModal()">Batal</button>
+                <button class="btn-submit" onclick="confirmComplete()">✅ Selesai & Simpan Harga</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentTechnicianId = null;
+        let currentOrderId = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'technician-login.html'; return; }
+            const querySnapshot = await getDocs(collection(db, "teknisi"));
+            let techDoc = null;
+            querySnapshot.forEach((d) => { if (d.data().email === user.email) techDoc = d; });
+            if (techDoc) {
+                currentTechnicianId = techDoc.id;
+                const data = techDoc.data();
+                document.getElementById('technicianName').textContent = data.nama;
+                document.getElementById('techNameDisplay').textContent = data.nama;
+                loadOrders();
+            } else { alert("Akun teknisi tidak ditemukan!"); }
+        });
+
+        async function loadOrders() {
+            const snapshot = await getDocs(collection(db, "pesanan"));
+            const allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const myOrders = allOrders.filter(order => {
+                const tid = order.teknisiId;
+                if (order.status === 'Pending' && (!tid || tid === '' || tid === null)) return true;
+                if (order.status === 'Pending' && tid === currentTechnicianId) return true;
+                if ((order.status === 'Aktif' || order.status === 'Selesai') && tid === currentTechnicianId) return true;
+                return false;
+            });
+            document.getElementById('totalOrders').textContent = myOrders.length;
+            document.getElementById('pendingOrders').textContent = myOrders.filter(o => o.status === 'Pending').length;
+            document.getElementById('activeOrders').textContent = myOrders.filter(o => o.status === 'Aktif').length;
+            renderOrders('pendingList', myOrders.filter(o => o.status === 'Pending'));
+            renderOrders('activeList', myOrders.filter(o => o.status === 'Aktif'));
+        }
+
+        function renderOrders(containerId, orders) {
+            const container = document.getElementById(containerId);
+            if (orders.length === 0) { container.innerHTML = '<p style="color:#6B7280; padding:20px;">Tidak ada pesanan.</p>'; return; }
+            container.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <strong>${order.layanan}</strong>
+                        <span class="status-badge status-${order.status}">${order.status}</span>
+                    </div>
+                    <div class="info-row"> ${order.pelanggan || '-'} | ${order.tanggal || '-'}</div>
+                    <div class="info-row">📍 ${order.alamat || '-'}</div>
+                    <div class="action-buttons" style="margin-top:10px;">
+                        ${order.status === 'Pending' ? `<button class="btn-action btn-accept" onclick="window.takeOrder('${order.id}')">✅ Ambil Pesanan</button>` : ''}
+                        ${order.status === 'Aktif' ? `<button class="btn-action btn-complete" onclick="window.openHargaModal('${order.id}')">🏁 Selesai + Input Harga</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Global functions
+        window.takeOrder = async (id) => {
+            if (!confirm('Yakin mau ambil pesanan ini?')) return;
+            try {
+                await updateDoc(doc(db, "pesanan", id), { status: 'Aktif', teknisiId: currentTechnicianId });
+                alert("Pesanan berhasil diambil!"); loadOrders();
+            } catch (error) { alert("Gagal: " + error.message); }
+        };
+
+        window.openHargaModal = (orderId) => {
+            currentOrderId = orderId;
+            document.getElementById('inputTotal').value = '';
+            document.getElementById('hargaModal').style.display = 'flex';
+        };
+
+        window.closeHargaModal = () => {
+            document.getElementById('hargaModal').style.display = 'none';
+            currentOrderId = null;
+        };
+
+        window.confirmComplete = async () => {
+            if (!currentOrderId) return;
+            const total = parseInt(document.getElementById('inputTotal').value);
+            if (!total || total <= 0) { alert('Masukkan total biaya yang valid!'); return; }
+            try {
+                await updateDoc(doc(db, "pesanan", currentOrderId), {
+                    status: 'Selesai',
+                    total: total,
+                    statusPembayaran: 'Belum Bayar', // <-- Field baru untuk tracking pembayaran
+                    updatedAt: new Date().toISOString()
+                });
+                alert(`✅ Pesanan selesai! Total: Rp ${total.toLocaleString('id-ID')}`);
+                closeHargaModal();
+                loadOrders();
+            } catch (error) { alert("Gagal: " + error.message); }
+        };
+
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeService - Layanan Rumah Terpercaya</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --text-dark: #111827;
+            --text-muted: #6B7280;
+            --bg-light: #F3F4F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: white;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 8px;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 100px 5%;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--primary-dark);
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        /* SERVICES */
+        .services {
+            padding: 80px 5%;
+            background: var(--bg-light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: #D1FAE5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .service-card h3 {
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--text-dark);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer a {
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            /* Mobile menu hidden for simplicity */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">HomeService</div>
+        <div class="nav-links">
+            <a href="#layanan">Layanan</a>
+            <a href="#tentang">Tentang</a>
+            <a href="customer-login.html" class="btn-login">Login Pelanggan</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h1>Layanan Rumah Terpercaya</h1>
+        <p>Solusi praktis untuk kebutuhan rumah tangga Anda dengan teknisi profesional dan aman.</p>
+
+        <!-- TOMBOL UBAH KE LOGIN -->
+        <div class="btn-group">
+            <a href="customer-login.html" class="btn-cta">Mulai Sekarang</a>
+            <a href="#layanan" class="btn-outline">Lihat Layanan</a>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services" id="layanan">
+        <div class="section-title">
+            <h2>Layanan Kami</h2>
+            <p>Pilih layanan yang Anda butuhkan</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-snowflake"></i></div>
+                <h3>Service AC</h3>
+                <p>Perbaikan dan perawatan AC rumah Anda dengan teknisi berpengalaman</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-toilet"></i></div>
+                <h3>Sedot WC</h3>
+                <p>Layanan sedot WC cepat dan bersih untuk kenyamanan keluarga</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-key"></i></div>
+                <h3>Buat Kunci</h3>
+                <p>Pembuatan duplikat kunci rumah, mobil, dan motor dengan presisi</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-tools"></i></div>
+                <h3>Perbaikan Rumah</h3>
+                <p>Service berbagai peralatan dan perbaikan rumah tangga</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="tentang">
+        <p>&copy; 2026 HomeService. All rights reserved.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+            Admin? <a href="login.html" style="margin-right: 15px;">Login di sini</a> |
+            Teknisi? <a href="technician-login.html">Login di sini</a>
+        </p>
+    </footer>
+</body>
+
+</html>

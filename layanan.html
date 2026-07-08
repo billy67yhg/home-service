@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Layanan - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* KHUSUS HALAMAN LAYANAN */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-aktif {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-draft {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .action-btn.edit {
+            color: #F59E0B;
+        }
+
+        .action-btn.delete {
+            color: var(--danger);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .close-modal:hover {
+            color: var(--text-dark);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">HomeService</div>
+            <div class="admin-profile">
+                <div class="admin-avatar">AD</div>
+                <div class="admin-info">
+                    <div>Admin</div><small>Super Admin</small>
+                </div>
+            </div>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="teknisi.html" class="nav-item"><i class="fas fa-user-gear"></i> Teknisi</a>
+            <a href="layanan.html" class="nav-item active"><i class="fas fa-screwdriver-wrench"></i> Layanan</a>
+            <a href="pesanan.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Pesanan</a>
+            <a href="pelanggan.html" class="nav-item"><i class="fas fa-users"></i> Pelanggan</a>
+            <a href="transaksi.html" class="nav-item"><i class="fas fa-receipt"></i> Transaksi</a>
+            <a href="laporan.html" class="nav-item"><i class="fas fa-file-lines"></i> Laporan</a>
+            <a href="pengaturan.html" class="nav-item"><i class="fas fa-gear"></i> Pengaturan</a>
+            <a href="#" class="logout-btn"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2 class="page-title">Kelola Layanan</h2>
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput"
+                        placeholder="Cari layanan..."></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div class="filter-tabs" id="filterTabs">
+                    <div class="filter-tab active" data-filter="all">Semua</div>
+                    <div class="filter-tab" data-filter="Aktif">Aktif</div>
+                    <div class="filter-tab" data-filter="Draft">Draft</div>
+                </div>
+                <button class="btn-primary" id="addLayananBtn"><i class="fas fa-plus"></i> Tambah Layanan</button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Layanan</th>
+                                <th>Deskripsi</th>
+                                <th>Harga</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="layananTableBody">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH / EDIT -->
+    <div id="layananModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Layanan</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="layananForm">
+                <input type="hidden" id="layananId">
+                <div class="form-group"><label class="form-label">Nama Layanan</label><input type="text" id="inputNama"
+                        class="form-input" required placeholder="Contoh: Service AC"></div>
+                <div class="form-group"><label class="form-label">Deskripsi</label><input type="text" id="inputDesc"
+                        class="form-input" placeholder="Cuci, Freon, Perbaikan"></div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Harga Min</label><input type="number"
+                            id="inputMin" class="form-input" required></div>
+                    <div class="form-group"><label class="form-label">Harga Max</label><input type="number"
+                            id="inputMax" class="form-input" required></div>
+                </div>
+                <div class="form-group"><label class="form-label">Status</label>
+                    <select id="inputStatus" class="form-input">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Draft">Draft</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/layanan.js"></script>
+    <script type="module" src="js/navigation.js"></script>
+</body>
+
+</html>

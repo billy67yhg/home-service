@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .auth-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: var(--bg-main);
+        }
+
+        .auth-content {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-logo h1 {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+
+        .auth-logo p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-register:hover {
+            opacity: 0.9;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span {
+            background: var(--bg-main);
+            padding: 0 12px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .terms {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .terms a {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .auth-left {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <!-- LEFT SIDE -->
+        <div class="auth-left">
+            <div>
+                <h1 style="font-size: 2.5rem; margin-bottom: 12px;">HomeService</h1>
+                <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 40px;">Bergabung dengan kami</p>
+                <div style="background: rgba(255,255,255,0.1); padding: 24px; border-radius: 12px;">
+                    <h3 style="margin-bottom: 16px;">Keuntungan Bergabung:</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle"
+                                style="color: var(--primary); margin-right: 8px;"></i> Akses ke dashboard admin</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle"
+                                style="color: var(--primary); margin-right: 8px;"></i> Kelola layanan dengan mudah</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle"
+                                style="color: var(--primary); margin-right: 8px;"></i> Monitoring real-time</li>
+                        <li><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 8px;"></i>
+                            Laporan & statistik lengkap</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="text-align: center; opacity: 0.6; font-size: 0.85rem; margin-top: auto;">© 2026 HomeService. All
+                rights reserved.</p>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="auth-right">
+            <div class="auth-content">
+                <div class="auth-logo">
+                    <h1>Buat Akun Baru</h1>
+                    <p>Lengkapi data untuk mendaftar</p>
+                </div>
+
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" id="nama" class="form-input" placeholder="Masukkan nama lengkap" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="Masukkan email aktif" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nomor Telepon</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="08xx-xxxx-xxxx" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input"
+                            placeholder="Buat password (min. 6 karakter)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Konfirmasi Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="Ulangi password"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn-register">Daftar Sekarang</button>
+
+                    <div class="divider"><span>atau daftar dengan</span></div>
+
+                    <button type="button" class="btn-register"
+                        style="background: white; color: var(--text-dark); border: 1px solid var(--border);">
+                        <i class="fab fa-google" style="margin-right: 8px; color: #DB4437;"></i> Google
+                    </button>
+
+                    <div class="auth-footer">
+                        Sudah punya akun? <a href="login.html">Login di sini</a>
+                    </div>
+
+                    <p class="terms">
+                        Dengan mendaftar, Anda menyetujui <a href="#">Syarat & Ketentuan</a> kami
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>
