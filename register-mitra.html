@@ -205,6 +205,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -217,6 +218,7 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         const form = document.getElementById('registerForm');
@@ -234,30 +236,51 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
             try {
+                // STEP 1: Buat akun di Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // STEP 2: Simpan data ke Firestore collection cabang
                 const data = {
                     namaPemilik: document.getElementById('namaPemilik').value,
                     namaToko: document.getElementById('namaToko').value,
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value, // Nanti kita hash di step berikutnya
+                    email: email,
                     noTelepon: document.getElementById('noTelepon').value,
                     lokasi: document.getElementById('lokasi').value,
                     noRekening: document.getElementById('noRekening').value,
                     jenisLayanan: document.getElementById('jenisLayanan').value,
-                    status: 'pending', // <-- PENTING: Status pending menunggu approval
+                    status: 'pending', // <-- Status pending menunggu approval
                     createdAt: new Date().toISOString(),
                     approvedAt: null,
-                    approvedBy: null
+                    approvedBy: null,
+                    authUid: user.uid // <-- Simpan UID dari Firebase Auth
                 };
 
                 await addDoc(collection(db, "cabang"), data);
 
-                showAlert('✅ Pendaftaran berhasil! Mohon tunggu verifikasi dari Super Admin. Kami akan menghubungi Anda via email.', 'success');
+                // STEP 3: Logout otomatis (biar admin verifikasi dulu)
+                await auth.signOut();
+
+                showAlert('✅ Pendaftaran berhasil! Akun Anda menunggu verifikasi dari Super Admin. Silakan hubungi kami untuk informasi lebih lanjut.', 'success');
                 form.reset();
 
             } catch (error) {
                 console.error('Error:', error);
-                showAlert('❌ Gagal mendaftar: ' + error.message, 'error');
+
+                // Handle error spesifik
+                if (error.code === 'auth/email-already-in-use') {
+                    showAlert('❌ Email sudah terdaftar. Silakan gunakan email lain atau login.', 'error');
+                } else if (error.code === 'auth/weak-password') {
+                    showAlert('❌ Password terlalu lemah. Minimal 6 karakter.', 'error');
+                } else if (error.code === 'auth/invalid-email') {
+                    showAlert('❌ Email tidak valid.', 'error');
+                } else {
+                    showAlert('❌ Gagal mendaftar: ' + error.message, 'error');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Pendaftaran';
