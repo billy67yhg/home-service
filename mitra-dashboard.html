@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Mitra - HomeService</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-aktif {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-selesai {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-batal {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR KHUSUS MITRA -->
+        <aside class="sidebar">
+            <div class="brand">HomeService Mitra</div>
+            <div class="admin-profile">
+                <div class="admin-avatar" id="mitraAvatar">M</div>
+                <div class="admin-info">
+                    <div id="mitraNameDisplay">Loading...</div>
+                    <small>Pemilik Jasa</small>
+                </div>
+            </div>
+            <a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="fas fa-clipboard-list"></i> Pesanan Saya</a>
+            <a href="#" class="nav-item"><i class="fas fa-user-gear"></i> Teknisi Saya</a>
+            <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Dashboard <span id="shopName" style="color:var(--primary);">Toko</span></h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="stat-info">
+                        <h4>Total Pesanan</h4>
+                        <h2 id="statTotal">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-yellow"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h4>Pending</h4>
+                        <h2 id="statPending">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h4>Selesai</h4>
+                        <h2 id="statSelesai">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <h3>Pesanan Terbaru</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pelanggan</th>
+                                <th>Layanan</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Memuat
+                                    data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 1. Cek apakah user sudah login & punya info mitra
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const mitraInfo = JSON.parse(localStorage.getItem('mitraInfo'));
+            if (!mitraInfo || !mitraInfo.cabangId) {
+                // Jika tidak ada info cabang, kemungkinan login sebagai admin biasa atau error
+                alert('Akses ditolak. Silakan login sebagai Pemilik Jasa.');
+                signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Setup UI
+            document.getElementById('mitraNameDisplay').textContent = mitraInfo.namaPemilik;
+            document.getElementById('shopName').textContent = mitraInfo.namaToko;
+            document.getElementById('mitraAvatar').textContent = mitraInfo.namaToko.charAt(0).toUpperCase();
+
+            // Load data khusus cabang ini
+            loadMitraData(mitraInfo.cabangId);
+        });
+
+        async function loadMitraData(cabangId) {
+            try {
+                // Query PESANAN dengan filter CABANG
+                const qOrders = query(
+                    collection(db, "pesanan"),
+                    where("cabangId", "==", cabangId),
+                    orderBy("createdAt", "desc")
+                );
+                const snapOrders = await getDocs(qOrders);
+                const orders = snapOrders.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Query TEKNISI dengan filter CABANG (opsional, bisa ditambahkan nanti)
+                const qTeknisi = query(collection(db, "teknisi"), where("cabangId", "==", cabangId));
+                const snapTeknisi = await getDocs(qTeknisi);
+
+                // Update Stats
+                document.getElementById('statTotal').textContent = orders.length;
+                document.getElementById('statPending').textContent = orders.filter(o => o.status === 'Pending').length;
+                document.getElementById('statSelesai').textContent = orders.filter(o => o.status === 'Selesai').length;
+
+                // Render Table
+                const tbody = document.getElementById('ordersTableBody');
+                if (orders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-inbox"></i><br>Belum ada pesanan untuk toko ini.</td></tr>`;
+                } else {
+                    tbody.innerHTML = orders.map(o => `
+                        <tr>
+                            <td style="font-family:monospace;font-size:0.85rem;">${o.id.substring(0, 8)}</td>
+                            <td>${o.pelanggan || '-'}</td>
+                            <td>${o.layanan || '-'}</td>
+                            <td>${o.tanggal || '-'}</td>
+                            <td><span class="status-badge status-${o.status?.toLowerCase()}">${o.status || 'Pending'}</span></td>
+                            <td style="font-weight:600;color:#10B981;">${o.total ? 'Rp ' + o.total.toLocaleString('id-ID') : '-'}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+                document.getElementById('ordersTableBody').innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Gagal memuat data: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            localStorage.removeItem('mitraInfo');
+            await signOut(auth);
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+
+</html>
