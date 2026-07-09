@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teknisi Saya - HomeService Mitra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-aktif {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-nonaktif {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .action-btn.edit {
+            color: #3B82F6;
+            border-color: #3B82F6;
+        }
+
+        .action-btn.edit:hover {
+            background: #DBEAFE;
+        }
+
+        .action-btn.delete {
+            color: #EF4444;
+            border-color: #EF4444;
+        }
+
+        .action-btn.delete:hover {
+            background: #FEE2E2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #374151;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">HomeService Mitra</div>
+            <div class="admin-profile">
+                <div class="admin-avatar" id="mitraAvatar">M</div>
+                <div class="admin-info">
+                    <div id="mitraNameDisplay">Loading...</div>
+                    <small>Pemilik Jasa</small>
+                </div>
+            </div>
+            <a href="mitra-dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="mitra-pesanan.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Pesanan Saya</a>
+            <a href="#" class="nav-item active"><i class="fas fa-user-gear"></i> Teknisi Saya</a>
+            <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Teknisi - <span id="shopName" style="color:var(--primary);">Toko</span></h2>
+                <button class="btn-primary" onclick="openAddModal()"
+                    style="padding:10px 20px; border:none; border-radius:8px; cursor:pointer; background:var(--primary); color:white;">
+                    <i class="fas fa-plus"></i> Tambah Teknisi
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h4>Total Teknisi</h4>
+                        <h2 id="statTotal">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h4>Aktif</h4>
+                        <h2 id="statAktif">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-red"><i class="fas fa-times-circle"></i></div>
+                    <div class="stat-info">
+                        <h4>Nonaktif</h4>
+                        <h2 id="statNonaktif">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>No. HP</th>
+                                <th>Keahlian</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teknisiTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Memuat
+                                    data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT TEKNISI -->
+    <div id="teknisiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Teknisi</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="teknisiForm">
+                <input type="hidden" id="teknisiId">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="inputNama" required placeholder="Contoh: Budi Santoso">
+                </div>
+                <div class="form-group">
+                    <label>Nomor HP / WhatsApp</label>
+                    <input type="tel" id="inputHp" required placeholder="08xxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>Keahlian / Layanan</label>
+                    <input type="text" id="inputKeahlian" placeholder="Contoh: AC, Listrik, Pipa">
+                    <small style="color:#6B7280;font-size:0.8rem;">Pisahkan dengan koma jika lebih dari satu</small>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="inputStatus">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-save">💾 Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let teknisiData = [];
+        let currentCabangId = null;
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            const mitraInfo = JSON.parse(localStorage.getItem('mitraInfo'));
+            if (!mitraInfo || !mitraInfo.cabangId) {
+                alert('Akses ditolak.'); signOut(auth); window.location.href = 'login.html'; return;
+            }
+            currentCabangId = mitraInfo.cabangId;
+            document.getElementById('mitraNameDisplay').textContent = mitraInfo.namaPemilik;
+            document.getElementById('shopName').textContent = mitraInfo.namaToko;
+            document.getElementById('mitraAvatar').textContent = mitraInfo.namaToko.charAt(0).toUpperCase();
+            loadTeknisi();
+        });
+
+        async function loadTeknisi() {
+            try {
+                const q = query(collection(db, "teknisi"), where("cabangId", "==", currentCabangId));
+                const snapshot = await getDocs(q);
+                teknisiData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Update Stats
+                document.getElementById('statTotal').textContent = teknisiData.length;
+                document.getElementById('statAktif').textContent = teknisiData.filter(t => t.status === 'Aktif').length;
+                document.getElementById('statNonaktif').textContent = teknisiData.filter(t => t.status === 'Nonaktif').length;
+
+                renderTable();
+            } catch (error) {
+                console.error(error);
+                document.getElementById('teknisiTableBody').innerHTML = `<tr><td colspan="5" style="color:red;text-align:center;">Gagal memuat: ${error.message}</td></tr>`;
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('teknisiTableBody');
+            if (teknisiData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-users-slash"></i><br>Belum ada teknisi. Klik "Tambah Teknisi" untuk mulai.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = teknisiData.map(t => `
+                <tr>
+                    <td><strong>${t.nama || '-'}</strong></td>
+                    <td>${t.noHp || '-'}</td>
+                    <td>${t.keahlian || '-'}</td>
+                    <td><span class="status-badge status-${t.status?.toLowerCase()}">${t.status || 'Aktif'}</span></td>
+                    <td>
+                        <button class="action-btn edit" onclick="editTeknisi('${t.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete" onclick="hapusTeknisi('${t.id}')" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Modal Functions
+        window.openAddModal = () => {
+            document.getElementById('modalTitle').textContent = 'Tambah Teknisi';
+            document.getElementById('teknisiForm').reset();
+            document.getElementById('teknisiId').value = '';
+            document.getElementById('teknisiModal').style.display = 'flex';
+        };
+
+        window.editTeknisi = (id) => {
+            const t = teknisiData.find(x => x.id === id);
+            if (!t) return;
+            document.getElementById('modalTitle').textContent = 'Edit Teknisi';
+            document.getElementById('teknisiId').value = t.id;
+            document.getElementById('inputNama').value = t.nama || '';
+            document.getElementById('inputHp').value = t.noHp || '';
+            document.getElementById('inputKeahlian').value = t.keahlian || '';
+            document.getElementById('inputStatus').value = t.status || 'Aktif';
+            document.getElementById('teknisiModal').style.display = 'flex';
+        };
+
+        window.closeModal = () => document.getElementById('teknisiModal').style.display = 'none';
+
+        window.hapusTeknisi = async (id) => {
+            if (!confirm('Yakin ingin menghapus teknisi ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            try {
+                await deleteDoc(doc(db, "teknisi", id));
+                alert('✅ Teknisi berhasil dihapus.');
+                loadTeknisi();
+            } catch (error) { alert('Gagal: ' + error.message); }
+        };
+
+        // Form Submit
+        document.getElementById('teknisiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('teknisiId').value;
+            const data = {
+                nama: document.getElementById('inputNama').value,
+                noHp: document.getElementById('inputHp').value,
+                keahlian: document.getElementById('inputKeahlian').value,
+                status: document.getElementById('inputStatus').value,
+                cabangId: currentCabangId, //  OTOMATIS TERIKAT KE CABANG MITRA
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "teknisi", id), data);
+                    alert('✅ Data teknisi berhasil diupdate!');
+                } else {
+                    data.createdAt = new Date().toISOString();
+                    await addDoc(collection(db, "teknisi"), data);
+                    alert('✅ Teknisi baru berhasil ditambahkan!');
+                }
+                closeModal();
+                loadTeknisi();
+            } catch (error) { alert('Gagal: ' + error.message); }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            localStorage.removeItem('mitraInfo');
+            await signOut(auth);
+            window.location.href = 'login.html';
+        });
+
+        // Init
+        loadTeknisi();
+    </script>
+</body>
+
+</html>
