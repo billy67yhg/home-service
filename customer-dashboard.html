@@ -145,6 +145,7 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
+            display: inline-block;
         }
 
         .status-Pending {
@@ -194,9 +195,29 @@
             cursor: pointer;
             font-size: 0.9rem;
             margin-top: 10px;
+            margin-left: 8px;
         }
 
         .btn-pay:hover {
+            background: #2563EB;
+        }
+
+        .chat-btn {
+            background: #3B82F6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-btn:hover {
             background: #2563EB;
         }
 
@@ -360,6 +381,140 @@
             color: #6B7280;
             margin-top: 4px;
         }
+
+        /* CHAT MODAL STYLES */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #F9FAFB;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message.own {
+            align-items: flex-end;
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            word-wrap: break-word;
+        }
+
+        .chat-message.own .chat-bubble {
+            background: #10B981;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.other .chat-bubble {
+            background: white;
+            color: #111827;
+            border: 1px solid #E5E7EB;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-sender {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .chat-time {
+            font-size: 0.7rem;
+            color: #9CA3AF;
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #E5E7EB;
+            border-radius: 0 0 16px 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 24px;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #10B981;
+        }
+
+        .chat-send {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .chat-send:hover {
+            background: #059669;
+        }
     </style>
 </head>
 
@@ -417,7 +572,6 @@
                 <span class="modal-close" onclick="closeBookingModal()">&times;</span>
             </div>
             <form id="bookingForm">
-                <!-- PILIH CABANG/JASA -->
                 <div class="cabang-selector">
                     <label><i class="fas fa-store"></i> Pilih Jasa/Toko Layanan</label>
                     <div id="cabangList">
@@ -426,35 +580,24 @@
                     </div>
                     <small>Pilih jasa/layanan yang ingin Anda gunakan</small>
                 </div>
-
-                <div class="form-group">
-                    <label for="inputLayanan">Pilih Layanan</label>
-                    <select id="inputLayanan" required>
+                <div class="form-group"><label for="inputLayanan">Pilih Layanan</label><select id="inputLayanan"
+                        required>
                         <option value="">-- Pilih Layanan --</option>
                         <option value="Service AC">Service AC</option>
                         <option value="Sedot WC">Sedot WC</option>
                         <option value="Buat Kunci">Buat Kunci</option>
                         <option value="Perbaikan Rumah">Perbaikan Rumah</option>
-                    </select>
+                    </select></div>
+                <div class="form-group"><label for="inputTanggal">Tanggal Service</label><input type="date"
+                        id="inputTanggal" required></div>
+                <div class="form-group"><label for="inputAlamat">Alamat Lengkap</label><textarea id="inputAlamat"
+                        required placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea></div>
+                <div class="form-group"><label for="inputCatatan">Catatan Tambahan (Opsional)</label><textarea
+                        id="inputCatatan" placeholder="Contoh: AC tidak dingin, butuh sparepart, dll..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="inputTanggal">Tanggal Service</label>
-                    <input type="date" id="inputTanggal" required>
-                </div>
-                <div class="form-group">
-                    <label for="inputAlamat">Alamat Lengkap</label>
-                    <textarea id="inputAlamat" required
-                        placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="inputCatatan">Catatan Tambahan (Opsional)</label>
-                    <textarea id="inputCatatan"
-                        placeholder="Contoh: AC tidak dingin, butuh sparepart, dll..."></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeBookingModal()">Batal</button>
-                    <button type="submit" class="btn-submit">Pesan Sekarang</button>
-                </div>
+                <div class="modal-actions"><button type="button" class="btn-cancel"
+                        onclick="closeBookingModal()">Batal</button><button type="submit" class="btn-submit">Pesan
+                        Sekarang</button></div>
             </form>
         </div>
     </div>
@@ -466,10 +609,8 @@
                 <h3 class="modal-title">Konfirmasi Pembayaran</h3>
                 <span class="modal-close" onclick="closePaymentModal()">&times;</span>
             </div>
-            <div class="bank-info">
-                <strong>💳 Transfer ke:</strong><br>
-                BCA: 0851 7672 0067 3103 Delfia.Billy.Safinas. HomeService<br>
-            </div>
+            <div class="bank-info"><strong>💳 Transfer ke:</strong><br>BCA: 0851 7672 0067 3103 Delfia.Billy.Safinas.
+                HomeService<br></div>
             <form id="paymentForm">
                 <input type="hidden" id="paymentOrderId">
                 <div class="form-group"><label>Nominal Transfer (Rp)</label><input type="text" id="paymentAmount"
@@ -478,18 +619,38 @@
                         required placeholder="Contoh: TRF123456"></div>
                 <div class="form-group"><label>Upload Bukti Transfer (Opsional)</label><input type="file"
                         id="paymentProof" accept="image/*"></div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closePaymentModal()">Batal</button>
-                    <button type="submit" class="btn-submit">Kirim Bukti</button>
-                </div>
+                <div class="modal-actions"><button type="button" class="btn-cancel"
+                        onclick="closePaymentModal()">Batal</button><button type="submit" class="btn-submit">Kirim
+                        Bukti</button></div>
             </form>
+        </div>
+    </div>
+
+    <!-- CHAT MODAL -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>💬 Chat Pesanan #<span id="chatOrderId"></span></h3>
+                <button class="chat-close" onclick="closeChat()">&times;</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div style="text-align:center;padding:40px;color:#6B7280;"><i class="fas fa-spinner fa-spin"
+                        style="font-size:2rem;"></i>
+                    <p>Memuat pesan...</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Ketik pesan..."
+                    onkeypress="if(event.key==='Enter')sendMessage()">
+                <button class="chat-send" onclick="sendMessage()">Kirim</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
@@ -506,46 +667,87 @@
 
         let selectedCabangId = null;
         let cabangData = [];
+        let currentChatRoomId = null;
+        let chatUnsubscribe = null;
 
-        window.openBookingModal = async function () {
-            document.getElementById('bookingModal').style.display = 'flex';
-            await loadCabangList();
-        }
-        window.closeBookingModal = function () {
-            document.getElementById('bookingModal').style.display = 'none';
-            document.getElementById('bookingForm').reset();
-            selectedCabangId = null;
-        }
-        document.getElementById('bookingModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('bookingModal')) closeBookingModal();
-        });
+        window.openBookingModal = async function () { document.getElementById('bookingModal').style.display = 'flex'; await loadCabangList(); }
+        window.closeBookingModal = function () { document.getElementById('bookingModal').style.display = 'none'; document.getElementById('bookingForm').reset(); selectedCabangId = null; }
+        document.getElementById('bookingModal').addEventListener('click', (e) => { if (e.target === document.getElementById('bookingModal')) closeBookingModal(); });
 
-        window.openPaymentModal = function (orderId, total) {
-            document.getElementById('paymentOrderId').value = orderId;
-            document.getElementById('paymentAmount').value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
-            document.getElementById('paymentModal').style.display = 'flex';
-        }
-        window.closePaymentModal = function () {
-            document.getElementById('paymentModal').style.display = 'none';
-            document.getElementById('paymentForm').reset();
-        }
-        document.getElementById('paymentModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('paymentModal')) closePaymentModal();
-        });
+        window.openPaymentModal = function (orderId, total) { document.getElementById('paymentOrderId').value = orderId; document.getElementById('paymentAmount').value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total); document.getElementById('paymentModal').style.display = 'flex'; }
+        window.closePaymentModal = function () { document.getElementById('paymentModal').style.display = 'none'; document.getElementById('paymentForm').reset(); }
+        document.getElementById('paymentModal').addEventListener('click', (e) => { if (e.target === document.getElementById('paymentModal')) closePaymentModal(); });
 
-        // Load daftar cabang/jasa yang approved
+        // CHAT FUNCTIONS
+        window.openChat = async (orderId) => {
+            currentChatRoomId = `pesanan_${orderId}`;
+            document.getElementById('chatOrderId').textContent = orderId.substring(0, 8);
+            document.getElementById('chatModal').style.display = 'flex';
+            await loadChatMessages(currentChatRoomId);
+        };
+
+        window.closeChat = () => {
+            if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+            document.getElementById('chatModal').style.display = 'none';
+            currentChatRoomId = null;
+        };
+
+        async function loadChatMessages(roomId) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const user = auth.currentUser;
+            try {
+                const messagesRef = collection(db, `chatrooms/${roomId}/messages`);
+                const q = query(messagesRef, orderBy('timestamp', 'asc'));
+                chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                    messagesDiv.innerHTML = '';
+                    if (snapshot.empty) {
+                        messagesDiv.innerHTML = '<div style="text-align:center;padding:40px;color:#6B7280;"><i class="fas fa-comments" style="font-size:3rem;margin-bottom:15px;opacity:0.5;"></i><p>Belum ada pesan</p><p style="font-size:0.85rem;">Mulai percakapan dengan teknisi/admin</p></div>';
+                        return;
+                    }
+                    snapshot.forEach((doc) => {
+                        const msg = doc.data();
+                        const isOwn = msg.from === user.uid;
+                        const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `chat-message ${isOwn ? 'own' : 'other'}`;
+                        msgDiv.innerHTML = `
+                            ${!isOwn ? `<div class="chat-sender">${msg.senderType === 'technician' ? '🔧 Teknisi' : msg.senderType === 'mitra' ? ' Admin Jasa' : '👤 Customer'}</div>` : ''}
+                            <div class="chat-bubble">${msg.message}</div>
+                            <div class="chat-time">${time}</div>
+                        `;
+                        messagesDiv.appendChild(msgDiv);
+                    });
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                });
+            } catch (error) {
+                console.error('Error loading chat:', error);
+                messagesDiv.innerHTML = '<div style="color:red;text-align:center;padding:20px;">Gagal memuat pesan</div>';
+            }
+        }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            const user = auth.currentUser;
+            if (!message || !currentChatRoomId) return;
+            try {
+                const messagesRef = collection(db, `chatrooms/${currentChatRoomId}/messages`);
+                await addDoc(messagesRef, { from: user.uid, senderType: 'customer', message: message, timestamp: new Date(), read: false });
+                input.value = '';
+                input.focus();
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Gagal mengirim pesan');
+            }
+        };
+
         async function loadCabangList() {
             const cabangListDiv = document.getElementById('cabangList');
             try {
                 const q = query(collection(db, "cabang"), where("status", "==", "approved"));
                 const snapshot = await getDocs(q);
                 cabangData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                if (cabangData.length === 0) {
-                    cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;padding:15px;"><i class="fas fa-exclamation-circle"></i><br>Belum ada jasa yang tersedia</div>';
-                    return;
-                }
-
+                if (cabangData.length === 0) { cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;padding:15px;"><i class="fas fa-exclamation-circle"></i><br>Belum ada jasa yang tersedia</div>'; return; }
                 cabangListDiv.innerHTML = cabangData.map((cabang, index) => `
                     <div class="cabang-option" onclick="selectCabang('${cabang.id}')">
                         <input type="radio" name="cabang" id="cabang${index}" value="${cabang.id}" ${selectedCabangId === cabang.id ? 'checked' : ''}>
@@ -556,61 +758,22 @@
                         </label>
                     </div>
                 `).join('');
-
-            } catch (error) {
-                console.error('Error loading cabang:', error);
-                cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;">Gagal memuat daftar jasa</div>';
-            }
+            } catch (error) { console.error('Error loading cabang:', error); cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;">Gagal memuat daftar jasa</div>'; }
         }
 
-        window.selectCabang = function (cabangId) {
-            selectedCabangId = cabangId;
-            document.querySelectorAll('input[name="cabang"]').forEach(radio => {
-                radio.checked = (radio.value === cabangId);
-            });
-        }
+        window.selectCabang = function (cabangId) { selectedCabangId = cabangId; document.querySelectorAll('input[name="cabang"]').forEach(radio => { radio.checked = (radio.value === cabangId); }); }
 
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const user = auth.currentUser;
-            if (!user) {
-                alert('Silakan login terlebih dahulu');
-                window.location.href = 'customer-login.html';
-                return;
-            }
-
-            if (!selectedCabangId) {
-                alert('❌ Silakan pilih jasa/toko layanan terlebih dahulu!');
-                return;
-            }
-
-            const pesanan = {
-                pelanggan: user.email.split('@')[0],
-                email: user.email,
-                telepon: '',
-                layanan: document.getElementById('inputLayanan').value,
-                tanggal: document.getElementById('inputTanggal').value,
-                alamat: document.getElementById('inputAlamat').value,
-                catatan: document.getElementById('inputCatatan').value || '-',
-                cabangId: selectedCabangId, //  OTOMATIS TERSIMPAN CABANG ID
-                status: 'Pending',
-                total: 0,
-                teknisiId: null,
-                statusPembayaran: null,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-
+            if (!user) { alert('Silakan login terlebih dahulu'); window.location.href = 'customer-login.html'; return; }
+            if (!selectedCabangId) { alert('❌ Silakan pilih jasa/toko layanan terlebih dahulu!'); return; }
+            const pesanan = { pelanggan: user.email.split('@')[0], email: user.email, telepon: '', layanan: document.getElementById('inputLayanan').value, tanggal: document.getElementById('inputTanggal').value, alamat: document.getElementById('inputAlamat').value, catatan: document.getElementById('inputCatatan').value || '-', cabangId: selectedCabangId, status: 'Pending', total: 0, teknisiId: null, statusPembayaran: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
             try {
                 await addDoc(collection(db, "pesanan"), pesanan);
                 alert('✅ Pesanan berhasil dibuat!\n\nPesanan akan dikirim ke ' + cabangData.find(c => c.id === selectedCabangId)?.namaToko + '\n\nTeknisi akan segera menghubungi Anda.');
-                closeBookingModal();
-                loadOrders(user);
-            } catch (error) {
-                console.error(error);
-                alert('❌ Gagal membuat pesanan: ' + error.message);
-            }
+                closeBookingModal(); loadOrders(user);
+            } catch (error) { console.error(error); alert(' Gagal membuat pesanan: ' + error.message); }
         });
 
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -618,11 +781,7 @@
             const orderId = document.getElementById('paymentOrderId').value;
             const ref = document.getElementById('paymentRef').value;
             try {
-                await updateDoc(doc(db, "pesanan", orderId), {
-                    statusPembayaran: 'Menunggu Verifikasi',
-                    paymentRef: ref,
-                    paidAt: new Date().toISOString()
-                });
+                await updateDoc(doc(db, "pesanan", orderId), { statusPembayaran: 'Menunggu Verifikasi', paymentRef: ref, paidAt: new Date().toISOString() });
                 alert('✅ Bukti pembayaran terkirim! Admin akan memverifikasi.');
                 closePaymentModal();
                 const user = auth.currentUser;
@@ -647,13 +806,9 @@
                         const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
                         let paymentBadge = '';
                         if (order.status === 'Selesai' && order.total > 0) {
-                            if (order.statusPembayaran === 'Lunas') {
-                                paymentBadge = `<span class="status-badge status-Bayar-Lunas">💰 Lunas</span>`;
-                            } else if (order.statusPembayaran === 'Menunggu Verifikasi') {
-                                paymentBadge = `<span class="status-badge status-Bayar-Pending">⏳ Menunggu Verifikasi</span>`;
-                            } else {
-                                paymentBadge = `<button class="btn-pay" onclick="openPaymentModal('${order.id}', ${order.total})">💳 Bayar Sekarang</button>`;
-                            }
+                            if (order.statusPembayaran === 'Lunas') paymentBadge = `<span class="status-badge status-Bayar-Lunas">💰 Lunas</span>`;
+                            else if (order.statusPembayaran === 'Menunggu Verifikasi') paymentBadge = `<span class="status-badge status-Bayar-Pending">⏳ Menunggu Verifikasi</span>`;
+                            else paymentBadge = `<button class="btn-pay" onclick="openPaymentModal('${order.id}', ${order.total})">💳 Bayar Sekarang</button>`;
                         }
                         const cabangName = order.cabangId ? `🏪 ${cabangData.find(c => c.id === order.cabangId)?.namaToko || 'Jasa'}` : '';
                         return `
@@ -663,11 +818,15 @@
                                 <span class="status-badge status-${order.status || 'Pending'}">${order.status || 'Pending'}</span>
                             </div>
                             ${cabangName ? `<p style="color:#10B981;font-size:0.85rem;margin:5px 0;">${cabangName}</p>` : ''}
-                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;"> ${order.tanggal || '-'} |  ${order.alamat || '-'}</p>
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📅 ${order.tanggal || '-'} | 📍 ${order.alamat || '-'}</p>
                             ${order.total > 0 ? `<p style="color:#10B981;font-weight:600;font-size:1.1rem;margin:10px 0;">💰 Total: ${formatRupiah(order.total)}</p>` : ''}
                             ${paymentBadge}
-                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;"> ${order.telepon || order.phone || '-'}</p>
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📞 ${order.telepon || order.phone || '-'}</p>
                             ${order.catatan ? `<p style="color:#6B7280;font-size:0.85rem;margin:5px 0;font-style:italic;">📝 ${order.catatan}</p>` : ''}
+                            <div style="margin-top:12px;">
+                                <button class="chat-btn" onclick="openChat('${order.id}')"> Chat</button>
+                                ${paymentBadge.includes('Bayar Sekarang') ? `<button class="btn-pay" onclick="openPaymentModal('${order.id}', ${order.total})">💳 Bayar Sekarang</button>` : ''}
+                            </div>
                         </div>`;
                     }).join('');
                 }
