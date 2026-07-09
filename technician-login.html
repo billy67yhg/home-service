@@ -121,7 +121,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -143,30 +143,50 @@
             const password = document.getElementById('password').value;
 
             try {
-                // Login dengan Firebase Auth
+                // 1. Login dengan Firebase Auth
                 await signInWithEmailAndPassword(auth, email, password);
 
-                // Cek apakah user ini teknisi di Firestore
+                // 2. Cek apakah user ini teknisi di Firestore
                 const q = query(collection(db, "teknisi"), where("email", "==", email));
                 const snapshot = await getDocs(q);
 
                 if (snapshot.empty) {
                     alert('Akun tidak terdaftar sebagai teknisi!');
+                    await signOut(auth);
                     return;
                 }
 
                 const teknisiData = snapshot.docs[0].data();
+                const cabangId = snapshot.docs[0].id; // Atau pakai field cabangId jika ada
 
+                // 3. Cek status aktif
                 if (teknisiData.status !== 'Aktif') {
-                    alert('Akun teknisi tidak aktif! Hubungi admin.');
+                    alert('Akun teknisi tidak aktif (Cuti/Libur). Hubungi admin jasa Anda.');
+                    await signOut(auth);
                     return;
                 }
 
-                // Redirect ke dashboard teknisi
+                // 4. Simpan info teknisi di localStorage untuk dashboard
+                localStorage.setItem('teknisiInfo', JSON.stringify({
+                    uid: snapshot.docs[0].id,
+                    nama: teknisiData.nama,
+                    email: teknisiData.email,
+                    cabangId: teknisiData.cabangId,
+                    keahlian: teknisiData.keahlian
+                }));
+
+                // 5. Redirect ke dashboard teknisi
                 window.location.href = 'technician-dashboard.html';
 
             } catch (error) {
-                alert('Login gagal: ' + error.message);
+                console.error('Login error:', error);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    alert('❌ Email atau password salah!');
+                } else if (error.code === 'auth/user-not-found') {
+                    alert('❌ Akun tidak ditemukan!');
+                } else {
+                    alert('❌ Login gagal: ' + error.message);
+                }
             }
         });
     </script>
