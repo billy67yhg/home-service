@@ -161,6 +161,7 @@
 
                 <div id="alertBox"></div>
 
+                <!-- FORM LOGIN (Hanya muncul jika role = admin) -->
                 <form id="loginForm">
                     <div class="form-group">
                         <label class="form-label">Email</label>
@@ -176,11 +177,11 @@
                     </button>
                 </form>
 
+                <!-- FOOTER (Tanpa link daftar admin) -->
                 <div class="auth-footer">
-                    <p>Belum punya akun?</p>
+                    <p id="footerText">Login sebagai Admin Platform</p>
                     <p style="margin-top: 8px;">
-                        <a href="register.html" id="linkRegister">Daftar Admin</a> |
-                        <a href="register-mitra.html">Daftar sebagai Mitra</a>
+                        <a href="#" id="mitraRegisterLink" style="display:none;">Daftar sebagai Pemilik Jasa →</a>
                     </p>
                 </div>
             </div>
@@ -207,12 +208,32 @@
 
         let selectedRole = 'admin';
 
-        // Role selector
+        // Role selector - UPDATED LOGIC
         window.selectRole = (role) => {
             selectedRole = role;
+
+            // Update button styles
             document.getElementById('btnAdmin').classList.toggle('active', role === 'admin');
             document.getElementById('btnMitra').classList.toggle('active', role === 'mitra');
-            document.getElementById('linkRegister').href = role === 'admin' ? 'register.html' : 'register-mitra.html';
+
+            const loginForm = document.getElementById('loginForm');
+            const footerText = document.getElementById('footerText');
+            const mitraRegisterLink = document.getElementById('mitraRegisterLink');
+
+            if (role === 'admin') {
+                // Admin: Show login form, hide register link
+                loginForm.style.display = 'block';
+                footerText.textContent = 'Login sebagai Admin Platform';
+                footerText.style.display = 'block';
+                mitraRegisterLink.style.display = 'none';
+            } else {
+                // Mitra: Hide login form, show register link
+                loginForm.style.display = 'none';
+                footerText.style.display = 'none';
+                mitraRegisterLink.style.display = 'inline';
+                mitraRegisterLink.href = 'register-mitra.html';
+            }
+
             document.getElementById('alertBox').innerHTML = '';
         };
 
@@ -233,55 +254,22 @@
                 // Login ke Firebase Auth
                 await signInWithEmailAndPassword(auth, email, password);
 
-                if (selectedRole === 'admin') {
-                    // Cek apakah ini super admin (cek di collection users)
-                    const q = query(collection(db, "users"), where("email", "==", email));
-                    const snapshot = await getDocs(q);
+                // ADMIN LOGIN FLOW
+                const q = query(collection(db, "users"), where("email", "==", email));
+                const snapshot = await getDocs(q);
 
-                    if (!snapshot.empty) {
-                        const userData = snapshot.docs[0].data();
-                        if (userData.role === 'admin' || userData.role === 'superadmin') {
-                            // Super Admin → dashboard.html
-                            window.location.href = 'dashboard.html';
-                        } else {
-                            // Bukan admin
-                            showAlert('❌ Akun ini bukan akun Admin. Pilih "Pemilik Jasa" atau hubungi Super Admin.', 'warning');
-                            await auth.signOut();
-                        }
+                if (!snapshot.empty) {
+                    const userData = snapshot.docs[0].data();
+                    if (userData.role === 'admin' || userData.role === 'superadmin') {
+                        // Super Admin → dashboard.html
+                        window.location.href = 'dashboard.html';
                     } else {
-                        showAlert('❌ Akun admin tidak ditemukan. Mungkin Anda perlu daftar sebagai Mitra?', 'warning');
+                        showAlert('❌ Akun ini bukan akun Admin Platform.', 'warning');
                         await auth.signOut();
                     }
                 } else {
-                    // MITRA LOGIN - Cek di collection cabang
-                    const q = query(collection(db, "cabang"), where("email", "==", email));
-                    const snapshot = await getDocs(q);
-
-                    if (!snapshot.empty) {
-                        const mitraData = snapshot.docs[0].data();
-                        const cabangId = snapshot.docs[0].id;
-
-                        if (mitraData.status === 'pending') {
-                            showAlert('⏳ Pendaftaran Anda masih menunggu verifikasi dari Super Admin. Silakan hubungi kami untuk informasi lebih lanjut.', 'warning');
-                            await auth.signOut();
-                        } else if (mitraData.status === 'rejected') {
-                            showAlert('❌ Pendaftaran Anda ditolak. Silakan hubungi Super Admin untuk informasi lebih lanjut.', 'warning');
-                            await auth.signOut();
-                        } else if (mitraData.status === 'approved') {
-                            // Simpan info mitra di localStorage
-                            localStorage.setItem('mitraInfo', JSON.stringify({
-                                cabangId: cabangId,
-                                namaToko: mitraData.namaToko,
-                                namaPemilik: mitraData.namaPemilik,
-                                email: mitraData.email
-                            }));
-                            // Redirect ke dashboard mitra
-                            window.location.href = 'mitra-dashboard.html';
-                        }
-                    } else {
-                        showAlert('❌ Akun mitra tidak ditemukan. Silakan daftar terlebih dahulu.', 'warning');
-                        await auth.signOut();
-                    }
+                    showAlert('❌ Akun admin tidak ditemukan.', 'warning');
+                    await auth.signOut();
                 }
             } catch (error) {
                 showAlert('❌ Login gagal: ' + error.message, 'warning');
@@ -290,6 +278,9 @@
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
             }
         });
+
+        // Init: Set default role to admin
+        selectRole('admin');
     </script>
 </body>
 
