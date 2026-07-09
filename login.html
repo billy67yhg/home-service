@@ -96,6 +96,7 @@
         .auth-footer a {
             color: var(--primary);
             text-decoration: none;
+            font-weight: 500;
         }
 
         .role-selector {
@@ -113,12 +114,21 @@
             cursor: pointer;
             font-weight: 500;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .role-btn:hover {
+            background: #F9FAFB;
         }
 
         .role-btn.active {
             border-color: var(--primary);
             background: #D1FAE5;
             color: #065F46;
+            font-weight: 600;
         }
 
         .alert {
@@ -132,6 +142,12 @@
             background: #FEF3C7;
             color: #92400E;
             border: 1px solid #F59E0B;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #10B981;
         }
     </style>
 </head>
@@ -161,7 +177,7 @@
 
                 <div id="alertBox"></div>
 
-                <!-- FORM LOGIN (Hanya muncul jika role = admin) -->
+                <!-- FORM LOGIN ADMIN -->
                 <form id="loginForm">
                     <div class="form-group">
                         <label class="form-label">Email</label>
@@ -177,11 +193,12 @@
                     </button>
                 </form>
 
-                <!-- FOOTER (Tanpa link daftar admin) -->
+                <!-- FOOTER -->
                 <div class="auth-footer">
                     <p id="footerText">Login sebagai Admin Platform</p>
                     <p style="margin-top: 8px;">
-                        <a href="#" id="mitraRegisterLink" style="display:none;">Daftar sebagai Pemilik Jasa →</a>
+                        Calon Mitra? <a href="register-mitra.html" style="color:var(--primary); font-weight:600;">Daftar
+                            Jasa di sini →</a>
                     </p>
                 </div>
             </div>
@@ -206,34 +223,17 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let selectedRole = 'admin';
-
-        // Role selector - UPDATED LOGIC
+        // Role selector - DIRECT REDIRECT FOR MITRA
         window.selectRole = (role) => {
-            selectedRole = role;
-
-            // Update button styles
-            document.getElementById('btnAdmin').classList.toggle('active', role === 'admin');
-            document.getElementById('btnMitra').classList.toggle('active', role === 'mitra');
-
-            const loginForm = document.getElementById('loginForm');
-            const footerText = document.getElementById('footerText');
-            const mitraRegisterLink = document.getElementById('mitraRegisterLink');
-
-            if (role === 'admin') {
-                // Admin: Show login form, hide register link
-                loginForm.style.display = 'block';
-                footerText.textContent = 'Login sebagai Admin Platform';
-                footerText.style.display = 'block';
-                mitraRegisterLink.style.display = 'none';
-            } else {
-                // Mitra: Hide login form, show register link
-                loginForm.style.display = 'none';
-                footerText.style.display = 'none';
-                mitraRegisterLink.style.display = 'inline';
-                mitraRegisterLink.href = 'register-mitra.html';
+            if (role === 'mitra') {
+                // Langsung redirect ke halaman register mitra
+                window.location.href = 'register-mitra.html';
+                return;
             }
 
+            // Untuk admin: reset button styles
+            document.getElementById('btnAdmin').classList.add('active');
+            document.getElementById('btnMitra').classList.remove('active');
             document.getElementById('alertBox').innerHTML = '';
         };
 
@@ -251,17 +251,14 @@
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             try {
-                // Login ke Firebase Auth
                 await signInWithEmailAndPassword(auth, email, password);
 
-                // ADMIN LOGIN FLOW
                 const q = query(collection(db, "users"), where("email", "==", email));
                 const snapshot = await getDocs(q);
 
                 if (!snapshot.empty) {
                     const userData = snapshot.docs[0].data();
                     if (userData.role === 'admin' || userData.role === 'superadmin') {
-                        // Super Admin → dashboard.html
                         window.location.href = 'dashboard.html';
                     } else {
                         showAlert('❌ Akun ini bukan akun Admin Platform.', 'warning');
@@ -272,7 +269,14 @@
                     await auth.signOut();
                 }
             } catch (error) {
-                showAlert('❌ Login gagal: ' + error.message, 'warning');
+                console.error('Login error:', error);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    showAlert('❌ Email atau password salah!', 'warning');
+                } else if (error.code === 'auth/user-not-found') {
+                    showAlert('❌ Akun tidak ditemukan!', 'warning');
+                } else {
+                    showAlert('❌ Login gagal: ' + error.message, 'warning');
+                }
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
