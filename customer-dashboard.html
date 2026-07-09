@@ -208,7 +208,6 @@
             font-size: 0.9rem;
         }
 
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -274,6 +273,13 @@
             min-height: 80px;
         }
 
+        .form-group small {
+            color: #6B7280;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: block;
+        }
+
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -309,6 +315,50 @@
 
         .bank-info strong {
             color: #10B981;
+        }
+
+        .cabang-selector {
+            background: #EFF6FF;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .cabang-selector label {
+            font-weight: 600;
+            color: #1E40AF;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .cabang-option {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin: 5px 0;
+            border: 2px solid #E5E7EB;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .cabang-option:hover {
+            border-color: #3B82F6;
+            background: #F9FAFB;
+        }
+
+        .cabang-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .cabang-option strong {
+            color: #10B981;
+        }
+
+        .cabang-option small {
+            display: block;
+            color: #6B7280;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -363,28 +413,48 @@
     <div id="bookingModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Buat Pesanan Baru</h3><span class="modal-close"
-                    onclick="closeBookingModal()">&times;</span>
+                <h3 class="modal-title">Buat Pesanan Baru</h3>
+                <span class="modal-close" onclick="closeBookingModal()">&times;</span>
             </div>
             <form id="bookingForm">
-                <div class="form-group"><label for="inputLayanan">Pilih Layanan</label><select id="inputLayanan"
-                        required>
+                <!-- PILIH CABANG/JASA -->
+                <div class="cabang-selector">
+                    <label><i class="fas fa-store"></i> Pilih Jasa/Toko Layanan</label>
+                    <div id="cabangList">
+                        <div style="text-align:center;padding:20px;color:#6B7280;"><i
+                                class="fas fa-spinner fa-spin"></i><br>Memuat daftar jasa...</div>
+                    </div>
+                    <small>Pilih jasa/layanan yang ingin Anda gunakan</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputLayanan">Pilih Layanan</label>
+                    <select id="inputLayanan" required>
                         <option value="">-- Pilih Layanan --</option>
                         <option value="Service AC">Service AC</option>
                         <option value="Sedot WC">Sedot WC</option>
                         <option value="Buat Kunci">Buat Kunci</option>
                         <option value="Perbaikan Rumah">Perbaikan Rumah</option>
-                    </select></div>
-                <div class="form-group"><label for="inputTanggal">Tanggal Service</label><input type="date"
-                        id="inputTanggal" required></div>
-                <div class="form-group"><label for="inputAlamat">Alamat Lengkap</label><textarea id="inputAlamat"
-                        required placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea></div>
-                <div class="form-group"><label for="inputCatatan">Catatan Tambahan (Opsional)</label><textarea
-                        id="inputCatatan" placeholder="Contoh: AC tidak dingin, butuh sparepart, dll..."></textarea>
+                    </select>
                 </div>
-                <div class="modal-actions"><button type="button" class="btn-cancel"
-                        onclick="closeBookingModal()">Batal</button><button type="submit" class="btn-submit">Pesan
-                        Sekarang</button></div>
+                <div class="form-group">
+                    <label for="inputTanggal">Tanggal Service</label>
+                    <input type="date" id="inputTanggal" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputAlamat">Alamat Lengkap</label>
+                    <textarea id="inputAlamat" required
+                        placeholder="Jl. Contoh No. 123, Kecamatan, Kabupaten..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="inputCatatan">Catatan Tambahan (Opsional)</label>
+                    <textarea id="inputCatatan"
+                        placeholder="Contoh: AC tidak dingin, butuh sparepart, dll..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeBookingModal()">Batal</button>
+                    <button type="submit" class="btn-submit">Pesan Sekarang</button>
+                </div>
             </form>
         </div>
     </div>
@@ -393,8 +463,8 @@
     <div id="paymentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Konfirmasi Pembayaran</h3><span class="modal-close"
-                    onclick="closePaymentModal()">&times;</span>
+                <h3 class="modal-title">Konfirmasi Pembayaran</h3>
+                <span class="modal-close" onclick="closePaymentModal()">&times;</span>
             </div>
             <div class="bank-info">
                 <strong>💳 Transfer ke:</strong><br>
@@ -408,9 +478,10 @@
                         required placeholder="Contoh: TRF123456"></div>
                 <div class="form-group"><label>Upload Bukti Transfer (Opsional)</label><input type="file"
                         id="paymentProof" accept="image/*"></div>
-                <div class="modal-actions"><button type="button" class="btn-cancel"
-                        onclick="closePaymentModal()">Batal</button><button type="submit" class="btn-submit">Kirim
-                        Bukti</button></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closePaymentModal()">Batal</button>
+                    <button type="submit" class="btn-submit">Kirim Bukti</button>
+                </div>
             </form>
         </div>
     </div>
@@ -433,36 +504,113 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.openBookingModal = function () { document.getElementById('bookingModal').style.display = 'flex'; }
-        window.closeBookingModal = function () { document.getElementById('bookingModal').style.display = 'none'; document.getElementById('bookingForm').reset(); }
-        document.getElementById('bookingModal').addEventListener('click', (e) => { if (e.target === document.getElementById('bookingModal')) closeBookingModal(); });
+        let selectedCabangId = null;
+        let cabangData = [];
+
+        window.openBookingModal = async function () {
+            document.getElementById('bookingModal').style.display = 'flex';
+            await loadCabangList();
+        }
+        window.closeBookingModal = function () {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('bookingForm').reset();
+            selectedCabangId = null;
+        }
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('bookingModal')) closeBookingModal();
+        });
 
         window.openPaymentModal = function (orderId, total) {
             document.getElementById('paymentOrderId').value = orderId;
             document.getElementById('paymentAmount').value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
             document.getElementById('paymentModal').style.display = 'flex';
         }
-        window.closePaymentModal = function () { document.getElementById('paymentModal').style.display = 'none'; document.getElementById('paymentForm').reset(); }
-        document.getElementById('paymentModal').addEventListener('click', (e) => { if (e.target === document.getElementById('paymentModal')) closePaymentModal(); });
+        window.closePaymentModal = function () {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('paymentForm').reset();
+        }
+        document.getElementById('paymentModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('paymentModal')) closePaymentModal();
+        });
+
+        // Load daftar cabang/jasa yang approved
+        async function loadCabangList() {
+            const cabangListDiv = document.getElementById('cabangList');
+            try {
+                const q = query(collection(db, "cabang"), where("status", "==", "approved"));
+                const snapshot = await getDocs(q);
+                cabangData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                if (cabangData.length === 0) {
+                    cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;padding:15px;"><i class="fas fa-exclamation-circle"></i><br>Belum ada jasa yang tersedia</div>';
+                    return;
+                }
+
+                cabangListDiv.innerHTML = cabangData.map((cabang, index) => `
+                    <div class="cabang-option" onclick="selectCabang('${cabang.id}')">
+                        <input type="radio" name="cabang" id="cabang${index}" value="${cabang.id}" ${selectedCabangId === cabang.id ? 'checked' : ''}>
+                        <label for="cabang${index}" style="display:inline;cursor:pointer;">
+                            <strong>${cabang.namaToko}</strong><br>
+                            <small>📍 ${cabang.lokasi || '-'}</small><br>
+                            <small>🔧 ${cabang.jenisLayanan || 'Layanan Umum'}</small>
+                        </label>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading cabang:', error);
+                cabangListDiv.innerHTML = '<div style="color:#EF4444;text-align:center;">Gagal memuat daftar jasa</div>';
+            }
+        }
+
+        window.selectCabang = function (cabangId) {
+            selectedCabangId = cabangId;
+            document.querySelectorAll('input[name="cabang"]').forEach(radio => {
+                radio.checked = (radio.value === cabangId);
+            });
+        }
 
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const user = auth.currentUser;
-            if (!user) { alert('Silakan login terlebih dahulu'); window.location.href = 'customer-login.html'; return; }
+            if (!user) {
+                alert('Silakan login terlebih dahulu');
+                window.location.href = 'customer-login.html';
+                return;
+            }
+
+            if (!selectedCabangId) {
+                alert('❌ Silakan pilih jasa/toko layanan terlebih dahulu!');
+                return;
+            }
+
             const pesanan = {
-                pelanggan: user.email.split('@')[0], email: user.email, telepon: '',
+                pelanggan: user.email.split('@')[0],
+                email: user.email,
+                telepon: '',
                 layanan: document.getElementById('inputLayanan').value,
                 tanggal: document.getElementById('inputTanggal').value,
                 alamat: document.getElementById('inputAlamat').value,
                 catatan: document.getElementById('inputCatatan').value || '-',
-                status: 'Pending', total: 0, teknisiId: null,
-                statusPembayaran: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+                cabangId: selectedCabangId, //  OTOMATIS TERSIMPAN CABANG ID
+                status: 'Pending',
+                total: 0,
+                teknisiId: null,
+                statusPembayaran: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
             };
+
             try {
                 await addDoc(collection(db, "pesanan"), pesanan);
-                alert('✅ Pesanan berhasil dibuat! Teknisi akan segera menghubungi Anda.');
-                closeBookingModal(); loadOrders(user);
-            } catch (error) { console.error(error); alert('❌ Gagal membuat pesanan: ' + error.message); }
+                alert('✅ Pesanan berhasil dibuat!\n\nPesanan akan dikirim ke ' + cabangData.find(c => c.id === selectedCabangId)?.namaToko + '\n\nTeknisi akan segera menghubungi Anda.');
+                closeBookingModal();
+                loadOrders(user);
+            } catch (error) {
+                console.error(error);
+                alert('❌ Gagal membuat pesanan: ' + error.message);
+            }
         });
 
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -507,16 +655,18 @@
                                 paymentBadge = `<button class="btn-pay" onclick="openPaymentModal('${order.id}', ${order.total})">💳 Bayar Sekarang</button>`;
                             }
                         }
+                        const cabangName = order.cabangId ? `🏪 ${cabangData.find(c => c.id === order.cabangId)?.namaToko || 'Jasa'}` : '';
                         return `
                         <div class="order-item">
                             <div class="order-header">
                                 <strong>${order.layanan || 'Layanan'}</strong>
                                 <span class="status-badge status-${order.status || 'Pending'}">${order.status || 'Pending'}</span>
                             </div>
-                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📅 ${order.tanggal || '-'} | 📍 ${order.alamat || '-'}</p>
+                            ${cabangName ? `<p style="color:#10B981;font-size:0.85rem;margin:5px 0;">${cabangName}</p>` : ''}
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;"> ${order.tanggal || '-'} |  ${order.alamat || '-'}</p>
                             ${order.total > 0 ? `<p style="color:#10B981;font-weight:600;font-size:1.1rem;margin:10px 0;">💰 Total: ${formatRupiah(order.total)}</p>` : ''}
                             ${paymentBadge}
-                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;">📞 ${order.telepon || order.phone || '-'}</p>
+                            <p style="color:#6B7280;font-size:0.9rem;margin:5px 0;"> ${order.telepon || order.phone || '-'}</p>
                             ${order.catatan ? `<p style="color:#6B7280;font-size:0.85rem;margin:5px 0;font-style:italic;">📝 ${order.catatan}</p>` : ''}
                         </div>`;
                     }).join('');
