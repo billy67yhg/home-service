@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Saya - HomeService Mitra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-aktif {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-selesai {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-batal {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .payment-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .payment-lunas {
+            background: #10B981;
+            color: white;
+        }
+
+        .payment-pending {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .payment-belum {
+            background: #6B7280;
+            color: white;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .action-btn.primary {
+            color: #10B981;
+            border-color: #10B981;
+        }
+
+        .action-btn.primary:hover {
+            background: #D1FAE5;
+        }
+
+        .action-btn.warning {
+            color: #F59E0B;
+            border-color: #F59E0B;
+        }
+
+        .action-btn.warning:hover {
+            background: #FEF3C7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #6B7280;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #374151;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">HomeService Mitra</div>
+            <div class="admin-profile">
+                <div class="admin-avatar" id="mitraAvatar">M</div>
+                <div class="admin-info">
+                    <div id="mitraNameDisplay">Loading...</div>
+                    <small>Pemilik Jasa</small>
+                </div>
+            </div>
+            <a href="mitra-dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-item active"><i class="fas fa-clipboard-list"></i> Pesanan Saya</a>
+            <a href="mitra-teknisi.html" class="nav-item"><i class="fas fa-user-gear"></i> Teknisi Saya</a>
+            <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Pesanan - <span id="shopName" style="color:var(--primary);">Toko</span></h2>
+            </div>
+
+            <div class="filter-tabs" style="margin-bottom: 20px;" id="filterTabs">
+                <div class="filter-tab active" data-filter="all">Semua</div>
+                <div class="filter-tab" data-filter="Pending">Pending</div>
+                <div class="filter-tab" data-filter="Aktif">Aktif</div>
+                <div class="filter-tab" data-filter="Selesai">Selesai</div>
+                <div class="filter-tab" data-filter="payment-pending" style="background:#F59E0B;color:white;">💳
+                    Menunggu Bayar</div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pelanggan</th>
+                                <th>Layanan</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Pembayaran</th>
+                                <th>Total</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Memuat
+                                    data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DETAIL PESANAN -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📄 Detail Pesanan</h3>
+                <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+            </div>
+            <div id="detailContent"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-cancel" onclick="closeDetailModal()"
+                    style="flex:1; padding:10px; border:none; border-radius:8px; cursor:pointer;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UPDATE STATUS -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Update Status Pesanan</h3>
+                <span class="close-modal" onclick="closeStatusModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Status Pesanan</label>
+                <select id="inputStatus">
+                    <option value="Pending">Pending</option>
+                    <option value="Aktif">Aktif (Sedang Dikerjakan)</option>
+                    <option value="Selesai">Selesai</option>
+                    <option value="Batal">Dibatalkan</option>
+                </select>
+            </div>
+            <div class="form-group" id="hargaGroup" style="display:none;">
+                <label>Total Biaya Service (Rp)</label>
+                <input type="number" id="inputTotal" placeholder="Contoh: 150000" min="0">
+                <small style="color:#6B7280;font-size:0.8rem;">Masukkan total biaya jasa + sparepart</small>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeStatusModal()">Batal</button>
+                <button class="btn-save" onclick="saveStatus()">💾 Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VERIFIKASI PEMBAYARAN -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💳 Verifikasi Pembayaran</h3>
+                <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div id="paymentDetails"></div>
+            <div style="background:#F9FAFB; padding:15px; border-radius:8px; margin:15px 0; text-align:center;">
+                <i class="fas fa-file-invoice" style="font-size:2rem;color:#9CA3AF;margin-bottom:10px;"></i>
+                <p style="margin:0;font-weight:500;">Bukti Transfer</p>
+                <p style="margin:5px 0 0 0;font-size:0.85rem;color:#6B7280;" id="paymentRefDisplay">Ref: -</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePaymentModal()">Batal</button>
+                <button class="btn-cancel" style="background:#EF4444;color:white;" onclick="rejectPayment()">❌
+                    Tolak</button>
+                <button class="btn-save" onclick="approvePayment()">✅ Terima & Lunas</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkZd7mkg6T6j1iCg15gsc02-EF97gajXE",
+            authDomain: "home-service-bengkalis.firebaseapp.com",
+            projectId: "home-service-bengkalis",
+            storageBucket: "home-service-bengkalis.firebasestorage.app",
+            messagingSenderId: "901348636964",
+            appId: "1:901348636964:web:d5a8f40e6d48d17f1d5bb1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let ordersData = [];
+        let currentFilter = 'all';
+        let currentCabangId = null;
+        let currentOrderId = null;
+        let currentOrderStatus = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            const mitraInfo = JSON.parse(localStorage.getItem('mitraInfo'));
+            if (!mitraInfo || !mitraInfo.cabangId) {
+                alert('Akses ditolak. Silakan login sebagai Pemilik Jasa.');
+                signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+            currentCabangId = mitraInfo.cabangId;
+            document.getElementById('mitraNameDisplay').textContent = mitraInfo.namaPemilik;
+            document.getElementById('shopName').textContent = mitraInfo.namaToko;
+            document.getElementById('mitraAvatar').textContent = mitraInfo.namaToko.charAt(0).toUpperCase();
+            loadOrders();
+        });
+
+        async function loadOrders() {
+            try {
+                const q = query(collection(db, "pesanan"), where("cabangId", "==", currentCabangId));
+                const snapshot = await getDocs(q);
+                ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderTable();
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('ordersTableBody').innerHTML = `<tr><td colspan="8" style="color:red;text-align:center;">Gagal memuat: ${error.message}</td></tr>`;
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('ordersTableBody');
+            let filtered = ordersData;
+            if (currentFilter !== 'all' && currentFilter !== 'payment-pending') {
+                filtered = filtered.filter(o => o.status === currentFilter);
+            }
+            if (currentFilter === 'payment-pending') {
+                filtered = filtered.filter(o => o.statusPembayaran === 'Menunggu Verifikasi');
+            }
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="fas fa-inbox"></i><br>Tidak ada pesanan ${currentFilter === 'all' ? '' : currentFilter}</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filtered.map(o => {
+                let paymentBadge = '';
+                if (o.status === 'Selesai' && o.total > 0) {
+                    if (o.statusPembayaran === 'Lunas') paymentBadge = `<span class="payment-badge payment-lunas">💰 Lunas</span>`;
+                    else if (o.statusPembayaran === 'Menunggu Verifikasi') paymentBadge = `<span class="payment-badge payment-pending">⏳ Menunggu</span>`;
+                    else paymentBadge = `<span class="payment-badge payment-belum">⚪ Belum Bayar</span>`;
+                } else paymentBadge = `<span class="payment-badge payment-belum">-</span>`;
+
+                const verifyBtn = (o.status === 'Selesai' && o.statusPembayaran === 'Menunggu Verifikasi')
+                    ? `<button class="action-btn warning" onclick="openPaymentModal('${o.id}')" title="Verifikasi"><i class="fas fa-check-circle"></i></button>` : '';
+
+                return `
+                <tr>
+                    <td style="font-family:monospace;font-size:0.85rem;">${o.id?.substring(0, 8)}</td>
+                    <td><div style="font-weight:500;">${o.pelanggan || '-'}</div><div style="font-size:0.8rem;color:#6B7280;">${o.email || '-'}</div></td>
+                    <td>${o.layanan || '-'}</td>
+                    <td>${o.tanggal || '-'}</td>
+                    <td><span class="status-badge status-${o.status?.toLowerCase()}">${o.status || 'Pending'}</span></td>
+                    <td>${paymentBadge}</td>
+                    <td style="font-weight:600;color:#10B981;">${o.total ? 'Rp ' + o.total.toLocaleString('id-ID') : '-'}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewDetail('${o.id}')" title="Detail"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn primary" onclick="openStatusModal('${o.id}', '${o.status}')" title="Update Status"><i class="fas fa-edit"></i></button>
+                        ${verifyBtn}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Global functions
+        window.viewDetail = (id) => {
+            const o = ordersData.find(x => x.id === id);
+            if (!o) return;
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-row"><span class="detail-label">ID Order</span><span class="detail-value">${o.id}</span></div>
+                <div class="detail-row"><span class="detail-label">Pelanggan</span><span class="detail-value">${o.pelanggan}</span></div>
+                <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${o.email}</span></div>
+                <div class="detail-row"><span class="detail-label">Telepon</span><span class="detail-value">${o.telepon || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Layanan</span><span class="detail-value">${o.layanan}</span></div>
+                <div class="detail-row"><span class="detail-label">Tanggal</span><span class="detail-value">${o.tanggal}</span></div>
+                <div class="detail-row"><span class="detail-label">Alamat</span><span class="detail-value">${o.alamat}</span></div>
+                <div class="detail-row"><span class="detail-label">Catatan</span><span class="detail-value">${o.catatan || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="status-badge status-${o.status?.toLowerCase()}">${o.status}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Total</span><span class="detail-value" style="color:#10B981;font-size:1.1rem;">${o.total ? 'Rp ' + o.total.toLocaleString('id-ID') : '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Pembayaran</span><span class="detail-value">${o.statusPembayaran || 'Belum Ada'}</span></div>
+                ${o.paymentRef ? `<div class="detail-row"><span class="detail-label">Ref. Transfer</span><span class="detail-value">${o.paymentRef}</span></div>` : ''}
+            `;
+            document.getElementById('detailModal').style.display = 'flex';
+        };
+        window.closeDetailModal = () => document.getElementById('detailModal').style.display = 'none';
+
+        window.openStatusModal = (id, status) => {
+            currentOrderId = id;
+            currentOrderStatus = status;
+            document.getElementById('inputStatus').value = status;
+            document.getElementById('hargaGroup').style.display = (status === 'Aktif' || status === 'Selesai') ? 'block' : 'none';
+            document.getElementById('inputTotal').value = '';
+            document.getElementById('statusModal').style.display = 'flex';
+        };
+        window.closeStatusModal = () => { document.getElementById('statusModal').style.display = 'none'; currentOrderId = null; };
+        document.getElementById('inputStatus').addEventListener('change', (e) => {
+            document.getElementById('hargaGroup').style.display = (e.target.value === 'Aktif' || e.target.value === 'Selesai') ? 'block' : 'none';
+        });
+
+        window.saveStatus = async () => {
+            if (!currentOrderId) return;
+            const newStatus = document.getElementById('inputStatus').value;
+            const total = document.getElementById('inputTotal').value;
+            const updates = { status: newStatus, updatedAt: new Date().toISOString() };
+            if ((newStatus === 'Aktif' || newStatus === 'Selesai') && total && parseInt(total) > 0) {
+                updates.total = parseInt(total);
+                if (newStatus === 'Selesai') updates.statusPembayaran = 'Belum Bayar';
+            }
+            try {
+                await updateDoc(doc(db, "pesanan", currentOrderId), updates);
+                alert('✅ Status berhasil diupdate!');
+                closeStatusModal();
+                loadOrders();
+            } catch (error) { alert('Gagal: ' + error.message); }
+        };
+
+        window.openPaymentModal = (id) => {
+            const o = ordersData.find(x => x.id === id);
+            if (!o) return;
+            currentOrderId = id;
+            document.getElementById('paymentDetails').innerHTML = `
+                <div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value">${o.id?.substring(0, 8)}</span></div>
+                <div class="detail-row"><span class="detail-label">Pelanggan</span><span class="detail-value">${o.pelanggan}</span></div>
+                <div class="detail-row"><span class="detail-label">Layanan</span><span class="detail-value">${o.layanan}</span></div>
+                <div class="detail-row"><span class="detail-label">Total Bayar</span><span class="detail-value" style="color:#10B981;font-size:1.2rem;font-weight:700;">${o.total ? 'Rp ' + o.total.toLocaleString('id-ID') : '-'}</span></div>
+            `;
+            document.getElementById('paymentRefDisplay').textContent = `Ref: ${o.paymentRef || '-'}`;
+            document.getElementById('paymentModal').style.display = 'flex';
+        };
+        window.closePaymentModal = () => { document.getElementById('paymentModal').style.display = 'none'; currentOrderId = null; };
+        window.approvePayment = async () => {
+            if (!currentOrderId || !confirm('Konfirmasi pembayaran ini LUNAS?')) return;
+            try {
+                await updateDoc(doc(db, "pesanan", currentOrderId), { statusPembayaran: 'Lunas', verifiedAt: new Date().toISOString() });
+                alert('✅ Pembayaran dikonfirmasi LUNAS!');
+                closePaymentModal();
+                loadOrders();
+            } catch (error) { alert('Gagal: ' + error.message); }
+        };
+        window.rejectPayment = async () => {
+            if (!currentOrderId || !confirm('Tolak pembayaran ini?')) return;
+            try {
+                await updateDoc(doc(db, "pesanan", currentOrderId), { statusPembayaran: 'Belum Bayar', paymentRef: null });
+                alert('❌ Pembayaran ditolak. Customer dapat upload ulang bukti.');
+                closePaymentModal();
+                loadOrders();
+            } catch (error) { alert('Gagal: ' + error.message); }
+        };
+
+        // Filter tabs
+        document.getElementById('filterTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tab')) {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderTable();
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            localStorage.removeItem('mitraInfo');
+            await signOut(auth);
+            window.location.href = 'login.html';
+        });
+
+        // Init
+        loadOrders();
+    </script>
+</body>
+
+</html>
