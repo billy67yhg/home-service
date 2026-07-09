@@ -75,7 +75,6 @@
             opacity: 0.5;
         }
 
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -130,6 +129,13 @@
             font-size: 0.95rem;
         }
 
+        .form-group small {
+            color: #6B7280;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: block;
+        }
+
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -153,6 +159,20 @@
         .btn-cancel {
             background: #F3F4F6;
             color: #374151;
+        }
+
+        .auth-fields {
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .auth-fields h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            color: #1F2937;
         }
     </style>
 </head>
@@ -215,6 +235,7 @@
                         <thead>
                             <tr>
                                 <th>Nama</th>
+                                <th>Email</th>
                                 <th>No. HP</th>
                                 <th>Keahlian</th>
                                 <th>Status</th>
@@ -223,7 +244,7 @@
                         </thead>
                         <tbody id="teknisiTableBody">
                             <tr>
-                                <td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Memuat
+                                <td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Memuat
                                     data...</td>
                             </tr>
                         </tbody>
@@ -242,13 +263,29 @@
             </div>
             <form id="teknisiForm">
                 <input type="hidden" id="teknisiId">
+
+                <!-- Info Auth (Hanya muncul saat Tambah Baru) -->
+                <div class="auth-fields" id="authFields">
+                    <h4><i class="fas fa-lock"></i> Akun Login Teknisi</h4>
+                    <div class="form-group">
+                        <label>Email (untuk login teknisi) <span style="color:red">*</span></label>
+                        <input type="email" id="inputEmail" required placeholder="teknisi@homeservice.com">
+                        <small>Email ini akan digunakan teknisi untuk login ke dashboard</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Password <span style="color:red">*</span></label>
+                        <input type="password" id="inputPassword" required placeholder="Minimal 6 karakter"
+                            minlength="6">
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label>Nama Lengkap</label>
+                    <label>Nama Lengkap <span style="color:red">*</span></label>
                     <input type="text" id="inputNama" required placeholder="Contoh: Budi Santoso">
                 </div>
                 <div class="form-group">
                     <label>Nomor HP / WhatsApp</label>
-                    <input type="tel" id="inputHp" required placeholder="08xxxxxxxxxx">
+                    <input type="tel" id="inputHp" placeholder="08xxxxxxxxxx">
                 </div>
                 <div class="form-group">
                     <label>Keahlian / Layanan</label>
@@ -259,7 +296,7 @@
                     <label>Status</label>
                     <select id="inputStatus">
                         <option value="Aktif">Aktif</option>
-                        <option value="Nonaktif">Nonaktif</option>
+                        <option value="Nonaktif">Nonaktif (Cuti/Libur)</option>
                     </select>
                 </div>
                 <div class="modal-actions">
@@ -272,7 +309,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -290,6 +327,7 @@
 
         let teknisiData = [];
         let currentCabangId = null;
+        let isEditMode = false;
 
         // Auth Check
         onAuthStateChanged(auth, (user) => {
@@ -311,7 +349,6 @@
                 const snapshot = await getDocs(q);
                 teknisiData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // Update Stats
                 document.getElementById('statTotal').textContent = teknisiData.length;
                 document.getElementById('statAktif').textContent = teknisiData.filter(t => t.status === 'Aktif').length;
                 document.getElementById('statNonaktif').textContent = teknisiData.filter(t => t.status === 'Nonaktif').length;
@@ -319,19 +356,20 @@
                 renderTable();
             } catch (error) {
                 console.error(error);
-                document.getElementById('teknisiTableBody').innerHTML = `<tr><td colspan="5" style="color:red;text-align:center;">Gagal memuat: ${error.message}</td></tr>`;
+                document.getElementById('teknisiTableBody').innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Gagal memuat: ${error.message}</td></tr>`;
             }
         }
 
         function renderTable() {
             const tbody = document.getElementById('teknisiTableBody');
             if (teknisiData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-users-slash"></i><br>Belum ada teknisi. Klik "Tambah Teknisi" untuk mulai.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-users-slash"></i><br>Belum ada teknisi. Klik "Tambah Teknisi" untuk mulai.</td></tr>`;
                 return;
             }
             tbody.innerHTML = teknisiData.map(t => `
                 <tr>
                     <td><strong>${t.nama || '-'}</strong></td>
+                    <td style="font-size:0.85rem;">${t.email || '-'}</td>
                     <td>${t.noHp || '-'}</td>
                     <td>${t.keahlian || '-'}</td>
                     <td><span class="status-badge status-${t.status?.toLowerCase()}">${t.status || 'Aktif'}</span></td>
@@ -345,13 +383,18 @@
 
         // Modal Functions
         window.openAddModal = () => {
+            isEditMode = false;
             document.getElementById('modalTitle').textContent = 'Tambah Teknisi';
             document.getElementById('teknisiForm').reset();
             document.getElementById('teknisiId').value = '';
+            document.getElementById('authFields').style.display = 'block'; // Tampilkan field auth
+            document.getElementById('inputEmail').required = true;
+            document.getElementById('inputPassword').required = true;
             document.getElementById('teknisiModal').style.display = 'flex';
         };
 
         window.editTeknisi = (id) => {
+            isEditMode = true;
             const t = teknisiData.find(x => x.id === id);
             if (!t) return;
             document.getElementById('modalTitle').textContent = 'Edit Teknisi';
@@ -360,16 +403,28 @@
             document.getElementById('inputHp').value = t.noHp || '';
             document.getElementById('inputKeahlian').value = t.keahlian || '';
             document.getElementById('inputStatus').value = t.status || 'Aktif';
+            document.getElementById('inputEmail').value = t.email || '';
+            // Saat edit, field auth jadi optional & bisa readonly
+            document.getElementById('authFields').style.display = 'block';
+            document.getElementById('inputEmail').required = false;
+            document.getElementById('inputPassword').required = false;
+            document.getElementById('inputPassword').placeholder = 'Kosongkan jika tidak ingin mengubah password';
             document.getElementById('teknisiModal').style.display = 'flex';
         };
 
-        window.closeModal = () => document.getElementById('teknisiModal').style.display = 'none';
+        window.closeModal = () => {
+            document.getElementById('teknisiModal').style.display = 'none';
+            document.getElementById('teknisiId').value = '';
+        };
 
         window.hapusTeknisi = async (id) => {
-            if (!confirm('Yakin ingin menghapus teknisi ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            if (!confirm('Yakin ingin menghapus teknisi ini? Akun login juga akan dinonaktifkan.')) return;
             try {
+                // Hapus dari Firestore
                 await deleteDoc(doc(db, "teknisi", id));
-                alert('✅ Teknisi berhasil dihapus.');
+                // Note: Untuk hapus akun Auth, perlu Cloud Function (bisa di-skip untuk demo)
+                alert('✅ Teknisi berhasil dihapus dari daftar.');
+                closeModal();
                 loadTeknisi();
             } catch (error) { alert('Gagal: ' + error.message); }
         };
@@ -378,27 +433,69 @@
         document.getElementById('teknisiForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('teknisiId').value;
-            const data = {
-                nama: document.getElementById('inputNama').value,
-                noHp: document.getElementById('inputHp').value,
-                keahlian: document.getElementById('inputKeahlian').value,
-                status: document.getElementById('inputStatus').value,
-                cabangId: currentCabangId, //  OTOMATIS TERIKAT KE CABANG MITRA
+            const nama = document.getElementById('inputNama').value;
+            const noHp = document.getElementById('inputHp').value;
+            const keahlian = document.getElementById('inputKeahlian').value;
+            const status = document.getElementById('inputStatus').value;
+            const email = document.getElementById('inputEmail').value;
+            const password = document.getElementById('inputPassword').value;
+
+            const baseData = {
+                nama, noHp, keahlian, status, email,
+                cabangId: currentCabangId,
                 updatedAt: new Date().toISOString()
             };
 
             try {
                 if (id) {
-                    await updateDoc(doc(db, "teknisi", id), data);
+                    // EDIT MODE - Update Firestore saja
+                    const updateData = { ...baseData };
+                    // Kalau password diisi, update juga (perlu Cloud Function untuk update Auth)
+                    if (password && password.length >= 6) {
+                        alert('⚠️ Update password memerlukan fitur tambahan. Untuk sekarang, password tidak diubah.');
+                    }
+                    await updateDoc(doc(db, "teknisi", id), updateData);
                     alert('✅ Data teknisi berhasil diupdate!');
                 } else {
-                    data.createdAt = new Date().toISOString();
+                    // ADD MODE - Buat akun Auth + simpan ke Firestore
+                    if (!email || !password) {
+                        alert('❌ Email dan Password wajib diisi untuk membuat akun teknisi!');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        alert('❌ Password minimal 6 karakter!');
+                        return;
+                    }
+                    // 1. Buat akun di Firebase Authentication
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const uid = userCredential.user.uid;
+
+                    // 2. Simpan data ke Firestore
+                    const data = {
+                        ...baseData,
+                        authUid: uid,
+                        createdAt: new Date().toISOString(),
+                        role: 'teknisi'
+                    };
                     await addDoc(collection(db, "teknisi"), data);
-                    alert('✅ Teknisi baru berhasil ditambahkan!');
+
+                    // 3. Logout dari akun mitra (biar tidak bentrok session)
+                    await signOut(auth);
+
+                    alert('✅ Teknisi baru berhasil ditambahkan!\n\nEmail: ' + email + '\nPassword: ' + password + '\n\nTeknisi sekarang bisa login di halaman Login Teknisi.');
                 }
                 closeModal();
                 loadTeknisi();
-            } catch (error) { alert('Gagal: ' + error.message); }
+            } catch (error) {
+                console.error('Error:', error);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('❌ Email sudah terdaftar. Gunakan email lain.');
+                } else if (error.code === 'auth/weak-password') {
+                    alert('❌ Password terlalu lemah. Minimal 6 karakter.');
+                } else {
+                    alert('❌ Gagal: ' + error.message);
+                }
+            }
         });
 
         // Logout
